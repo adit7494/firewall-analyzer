@@ -50,7 +50,9 @@ export function Select({ options, value, onChange, placeholder, icon, style, cla
           justifyContent: 'space-between',
           padding: icon ? '11px 14px 11px 40px' : '11px 14px',
           borderRadius: '10px',
-          border: '1px solid var(--line)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: isOpen ? 'var(--cyan)' : 'var(--line)',
           background: 'var(--bg)',
           color: 'var(--txt)',
           fontSize: 14,
@@ -58,7 +60,7 @@ export function Select({ options, value, onChange, placeholder, icon, style, cla
           cursor: disabled ? 'not-allowed' : 'pointer',
           userSelect: 'none',
           transition: 'all 0.2s',
-          ...(isOpen ? { borderColor: 'var(--cyan)', boxShadow: '0 0 0 2px rgba(6,182,212,0.1)' } : {})
+          boxShadow: isOpen ? '0 0 0 2px rgba(6,182,212,0.1)' : 'none'
         }}
       >
         {icon && (
