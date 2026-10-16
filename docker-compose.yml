@@ -1,0 +1,23 @@
+services:
+
+  firewall-analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: firewall-analyzer
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - DATABASE_URL=file:/app/data/prod.db
+      - NEXTAUTH_SECRET=fih84egfgbskddifuyg
+      - NEXTAUTH_URL=http://localhost:3000
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - ./data:/app/data

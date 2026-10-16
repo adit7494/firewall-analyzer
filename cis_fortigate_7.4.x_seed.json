@@ -1,0 +1,1406 @@
+{
+  "benchmark": "CIS FortiGate 7.4.x Benchmark",
+  "benchmark_version": "v1.0.1",
+  "benchmark_date": "2026-01-07",
+  "tested_on": "FortiOS 7.4.5",
+  "vendor": "fortigate",
+  "note": "Field audit_procedure / remediation_procedure / default_value / references diekstrak langsung dari CIS PDF agar sistem dapat menampilkan 'cara cek' dan 'cara perbaiki' pada setiap finding. Import idempotent: upsert by (vendor, code).",
+  "rules": [
+    {
+      "code": "1.1",
+      "title": "Ensure DNS server is configured",
+      "section": "1 Network Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system dns > primary/secondary",
+      "expected_value": "Trusted DNS server configured (instead of default 96.45.45.45 / 96.45.46.46)",
+      "rationale": "Perform hostname to IP resolution using a trusted DNS server to prevent man-in-the-middle.",
+      "audit_procedure": "CLI:\nconfig system dns\nshows\n\nGUI: Network > DNS. Make sure to use a trusted DNS (default FortiGuard or custom).",
+      "remediation_procedure": "CLI:\nconfig system dns\n  set primary 8.8.8.8\n  set secondary 8.8.4.4\nend\n\nGUI: Network > DNS > Specify, isi Primary & Secondary DNS.",
+      "default_value": "Primary 96.45.45.45, Secondary 96.45.46.46",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/903162"
+      ],
+      "cis_controls": [
+        "v8 4.9",
+        "v7 11.1"
+      ]
+    },
+    {
+      "code": "1.2",
+      "title": "Ensure intra-zone traffic is not always allowed",
+      "section": "1 Network Settings",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config system zone > intrazone",
+      "expected_value": "set intrazone deny on the relevant zone",
+      "rationale": "Adding layers of protection between networks in the same zone; only authorized traffic is permitted.",
+      "audit_procedure": "CLI:\nconfig system zone\n  edit <ZONE>\n  show full (check: set intrazone deny)\n\nGUI: Network > Interfaces > select zone > Edit > ensure 'Block intra-zone traffic' is active.",
+      "remediation_procedure": "CLI:\nconfig system zone\n  edit <ZONE>\n  set intrazone deny\nend\n\nGUI: aktifkan 'Block intra-zone traffic' pada zone.",
+      "default_value": "Intra-zone traffic is blocked by default",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/314783845/config-system-zone",
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/116821"
+      ],
+      "cis_controls": [
+        "v8 13.4",
+        "v7 2.10"
+      ]
+    },
+    {
+      "code": "1.3",
+      "title": "Disable all management related services on WAN port",
+      "section": "1 Network Settings",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Critical",
+      "config_key": "config system interface > allowaccess (WAN)",
+      "expected_value": "allowaccess on WAN does not contain ping/https/http/ssh/snmp/radius-acct",
+      "rationale": "Management service can only be in the management interface; reduce the attack surface on the WAN.",
+      "audit_procedure": "CLI:\nshow system interface\nIdentify the WAN interface, make sure 'set allowaccess' does not contain ping, https, http, ssh, snmp, radius-acct.\n\nGUI: Network > Interfaces > WAN > check Administrative Access.",
+      "remediation_procedure": "CLI:\nconfig system interface\n  edit \"port1\"\n  unselect allowaccess ping https ssh snmp http radius-acct\nend\n\nGUI: nonaktifkan HTTPS/HTTP/ping/SSH/SNMP/Radius pada interface WAN. Untuk IPsec/SSLVPN gunakan local-in-policy (lihat 2.4).",
+      "default_value": "Depends on deployment",
+      "references": [],
+      "cis_controls": [
+        "v8 4.8",
+        "v7 1.6"
+      ]
+    },
+    {
+      "code": "2.1.1",
+      "title": "Ensure 'Pre-Login Banner' is set",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > pre-login-banner",
+      "expected_value": "enable",
+      "rationale": "Login banners reduce the risk of unauthorized access and strengthen the legal position against illegal access.",
+      "audit_procedure": "CLI:\nget system global   (cek: pre-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Pre-login Disclaimer Message'.",
+      "remediation_procedure": "CLI:\nconfig system global\n  set pre-login-banner enable\nend\n\nGUI: edit isi 'Pre-login Disclaimer Message' lalu Save.",
+      "default_value": "disable",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-Configuring-admin-disclaimer-page/ta-p/198609"
+      ],
+      "cis_controls": [
+        "v8 0.0 (Not Mapped)",
+        "v7 0.0 (Not Mapped)"
+      ]
+    },
+    {
+      "code": "2.1.2",
+      "title": "Ensure 'Post-Login-Banner' is set",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > post-login-banner",
+      "expected_value": "enable",
+      "rationale": "Post-login banner (MOTD) provides notification of legal rights & consent monitoring.",
+      "impact": "Script otomatis mungkin terpengaruh karena CLI/GUI butuh aksi 'Accept'.",
+      "audit_procedure": "CLI:\nget system global   (cek: post-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Post-login Disclaimer Message'.",
+      "remediation_procedure": "CLI:\nconfig system global\n  set post-login-banner enable\nend",
+      "default_value": "disable",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-Configuring-admin-disclaimer-page/ta-p/198609"
+      ],
+      "cis_controls": [
+        "v8 0.0 (Not Mapped)",
+        "v7 0.0 (Not Mapped)"
+      ]
+    },
+    {
+      "code": "2.1.3",
+      "title": "Ensure timezone is properly configured",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > timezone",
+      "expected_value": "According to location (not the default GMT-8 Pacific)",
+      "rationale": "Accurate time is important for the validity of certificates & timestamp logs.",
+      "audit_procedure": "CLI:\nget system global   (cek field: timezone)\n\nGUI: System > Settings > System Time.",
+      "remediation_procedure": "CLI:\nglobal system config\n  set timezone <id> (type 'set timezone ?' for a list of IDs)\nend",
+      "default_value": "(GMT-8:00) Pacific Time (US & Canada)",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/512210"
+      ],
+      "cis_controls": [
+        "v8 8.4",
+        "v7 6.1"
+      ]
+    },
+    {
+      "code": "2.1.4",
+      "title": "Ensure correct system time is configured through NTP",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config system ntp",
+      "expected_value": "Trusted NTP server configured (primary & secondary); sync status = runtime",
+      "rationale": "NTP maintains accurate time for event correlation, logging, and cryptographic functions. Use SHA1 when using symmetric keys (avoid MD5).",
+      "audit_procedure": "CLI:\ndiag sys ntp status   (cek: synchronized: yes)",
+      "remediation_procedure": "CLI:\nconfig system ntp\n  set type custom\n  config ntpserver\n    edit 1\n      set server pool.ntp.org\n    next\n    edit 2\n      set server 1.1.1.1\n  end\nend",
+      "default_value": "Using FortiGuard NTP",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/512210"
+      ],
+      "cis_controls": [
+        "v8 8.4",
+        "v7 6.1"
+      ]
+    },
+    {
+      "code": "2.1.5",
+      "title": "Ensure hostname is set",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > hostname",
+      "expected_value": "Not default (not model number)",
+      "rationale": "Hostnames are important for asset inventory, certificate deployment, and log correlation.",
+      "audit_procedure": "CLI:\nget system global   (cek field: hostname)\n\nGUI: System > Settings > Hostname.",
+      "remediation_procedure": "CLI:\nconfig system global\n  set hostname \"New_FGT1\"\nend",
+      "default_value": "Unit model number (e.g. 'FortiGate 2000E')",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-Renaming-the-hostname/ta-p/198521"
+      ],
+      "cis_controls": [
+        "v8 0.0 (Not Mapped)",
+        "v7 0.0 (Not Mapped)"
+      ]
+    },
+    {
+      "code": "2.1.6",
+      "title": "Ensure the latest firmware is installed",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Manual",
+      "system_check": "manual",
+      "severity": "High",
+      "config_key": "get system status > Version",
+      "expected_value": "Latest stable firmware; no open CVEs (compare to PSIRT)",
+      "rationale": "The latest firmware prevents exploitation of known vulnerabilities.",
+      "audit_procedure": "1. Check the latest version at https://docs.fortinet.com/upgrade-tool.\n2. CLI: get system status (check Version).\n3. Check CVE at https://www.fortiguard.com/psirt?product=FortiOS",
+      "remediation_procedure": "Determine the upgrade path via https://docs.fortinet.com/upgrade-tool, download the firmware from https://support.fortinet.com, then upgrade via GUI: System > Fabric Management > Upgrade (follow the path).",
+      "default_value": "No default (factory firmware during manufacturing)",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-How-to-upgrade-FortiGate-firmware/ta-p/194980"
+      ],
+      "cis_controls": [
+        "v8 10.2",
+        "v7 2.2",
+        "v7 8.2",
+        "v7 11.4"
+      ]
+    },
+    {
+      "code": "2.1.7",
+      "title": "Disable USB Firmware and configuration installation",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system auto-install > auto-install-config / auto-install-image",
+      "expected_value": "auto-install-config disable & auto-install-image disable",
+      "rationale": "Prevents manipulated config/firmware from being automatically loaded via USB.",
+      "audit_procedure": "CLI:\nconfig system auto-install\nget   (cek auto-install-config & auto-install-image disabled)",
+      "remediation_procedure": "CLI:\nconfig system auto-install\n  set auto-install-config disable\n  set auto-install-image disable\nend",
+      "default_value": "auto-install enabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/304730529/config-system-auto-install"
+      ],
+      "cis_controls": [
+        "v8 4.8",
+        "v7 11.3"
+      ]
+    },
+    {
+      "code": "2.1.8",
+      "title": "Disable static keys for TLS",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system global > ssl-static-key-ciphers",
+      "expected_value": "disable",
+      "rationale": "Prevent terminated TLS sessions on FortiGate using static SSL keys.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (cek ssl-static-key-ciphers disabled)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set ssl-static-key-ciphers disable\nend",
+      "default_value": "ssl-static-key-ciphers enabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/339914554/config-system-global"
+      ],
+      "cis_controls": [
+        "v8 4.8",
+        "v7 12.4"
+      ]
+    },
+    {
+      "code": "2.1.9",
+      "title": "Enable Global Strong Encryption",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config system global > strong-crypto",
+      "expected_value": "enable",
+      "rationale": "Forcing FortiOS to only use strong encryption & ciphers.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (cek strong-crypto enabled)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set strong-crypto enable\nend",
+      "default_value": "strong-crypto enabled by default",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/339914554/config-system-global"
+      ],
+      "cis_controls": [
+        "v8 0.0 (Not Mapped)",
+        "v7 18.5"
+      ]
+    },
+    {
+      "code": "2.1.10",
+      "title": "Ensure management GUI listens on secure TLS version",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config system global > admin-https-ssl-versions",
+      "expected_value": "tlsv1-3 (minimal tlsv1-2)",
+      "rationale": "Use high version of TLS to prevent MiTM attacks on GUI access.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (cek admin-https-ssl-versions tlsv1-3)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set admin-https-ssl-versions tlsv1-3\nend",
+      "default_value": "FortiOS 7.x: TLS 1.2 & 1.3",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/339914554/config-system-global"
+      ],
+      "cis_controls": [
+        "v8 0.0 (Not Mapped)",
+        "v7 0.0 (Not Mapped)"
+      ]
+    },
+    {
+      "code": "2.1.11",
+      "title": "Ensure CDN is enabled for improved GUI performance",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > gui-cdn-usage",
+      "expected_value": "enable",
+      "rationale": "Loading static GUI artifacts via CDN for performance; NOT a security control (informational).",
+      "impact": "Tidak ada dampak keamanan jika tidak diaktifkan.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (cek gui-cdn-usage enabled)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set gui-cdn-usage enable\nend",
+      "default_value": "Enabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/205105/loading-artifacts-from-a-cdn"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "2.1.12",
+      "title": "Ensure single CPU core overloaded event is logged",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > log-single-cpu-high",
+      "expected_value": "enable",
+      "rationale": "Detects single CPU core overload that can be missed on multi-core devices.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (cek log-single-cpu-high enabled)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set log-single-cpu-high enable\nend",
+      "default_value": "Disabled",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-Enable-logging-for-single-core-CPU-spike-against/ta-p/293010"
+      ],
+      "cis_controls": [
+        "v8 8.5",
+        "v7 6.2"
+      ]
+    },
+    {
+      "code": "2.1.13",
+      "title": "Ensure Hostname is Not Displayed On Login GUI",
+      "section": "2 System Settings > 2.1 General Settings",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system global > gui-display-hostname",
+      "expected_value": "disable",
+      "rationale": "The hostname on the login page can be information for reconnaissance.",
+      "audit_procedure": "CLI:\nget system global | grep -f gui-display   (cek gui-display-hostname: disable)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set gui-display-hostname disable\nend",
+      "default_value": "disable",
+      "references": [],
+      "cis_controls": []
+    },
+    {
+      "code": "2.2.1",
+      "title": "Ensure 'Password Policy' is enabled",
+      "section": "2 System Settings > 2.2 Password Policy",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config system password-policy",
+      "expected_value": "status enable, minimum-length >= 14, apply-to admin-password ipsec-preshared-key (scope both)",
+      "rationale": "Complex/long passwords prevent brute force. CIS: minimum 14 characters.",
+      "audit_procedure": "CLI:\nget system password-policy\n\nGUI: System > Settings > Password Policy (scope=Both, Minimum length=14).",
+      "remediation_procedure": "CLI:\nconfig system password-policy\n  set status enable\n  set apply-to admin-password ipsec-preshared-key\n  set minimum-length 14\nend",
+      "default_value": "Password Policy disabled (scope Off)",
+      "references": [
+        "https://pages.nist.gov/800-63-4/sp800-63b.html",
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/127236326/config-system-password-policy"
+      ],
+      "cis_controls": [
+        "v8 5.2",
+        "v7 4.4"
+      ]
+    },
+    {
+      "code": "2.2.2",
+      "title": "Ensure administrator password retries and lockout time are configured",
+      "section": "2 System Settings > 2.2 Password Policy",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system global > admin-lockout-threshold / admin-lockout-duration",
+      "expected_value": "admin-lockout-threshold <= 3 dan admin-lockout-duration <= 900",
+      "rationale": "Limit failed login attempts to minimize brute force.",
+      "audit_procedure": "CLI:\nget system global   (cek admin-lockout-threshold & admin-lockout-duration)",
+      "remediation_procedure": "CLI:\nconfig system global\n  set admin-lockout-threshold 3\n  set admin-lockout-duration 900\nend",
+      "default_value": "threshold 3, duration 60 detik",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/339914554/config-system-global"
+      ],
+      "cis_controls": [
+        "v8 5.4",
+        "v7 4.3"
+      ]
+    },
+    {
+      "code": "2.3.1",
+      "title": "Ensure only SNMPv3 is enabled",
+      "section": "2 System Settings > 2.3 SNMP",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system snmp community / config system snmp user",
+      "expected_value": "There is no community SNMPv1/v2c; SNMPv3 users only (auth-priv, sha256/aes256)",
+      "rationale": "SNMPv3 adds authentication & privacy; v1/v2c sends clear text data.",
+      "impact": "SNMP server lama (v1/v2c) tidak bisa query.",
+      "audit_procedure": "CLI:\nconfig system snmp sysinfo (show; status enable)\nconfig system snmp community (show; harus kosong)\nconfig system snmp user (show; ada user v3)\n\nGUI: System > SNMP.",
+      "remediation_procedure": "CLI: aktifkan agent (config system snmp sysinfo > set status enable), hapus community v1/v2c (delete <id>), tambah user v3 (security-level auth-priv, auth-proto sha256, priv-proto aes256).",
+      "default_value": "SNMP agent disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/325005/basic-configuration"
+      ],
+      "cis_controls": [
+        "v8 12.3",
+        "v7 11.5"
+      ]
+    },
+    {
+      "code": "2.3.2",
+      "title": "Allow only trusted hosts in SNMPv3",
+      "section": "2 System Settings > 2.3 SNMP",
+      "cis_level": "L2",
+      "cis_status": "Manual",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system snmp user > notify-hosts",
+      "expected_value": "notify-hosts contains specific IPs; no 0.0.0.0",
+      "rationale": "Restricts SNMP information to only relevant devices (NMS).",
+      "audit_procedure": "CLI:\nshow system snmp user   (cek notify-hosts = IP spesifik, tanpa 0.0.0.0)\n\nGUI: System > SNMP > SNMPv3 > Hosts.",
+      "remediation_procedure": "CLI:\nconfig system snmp user\n  edit <user>\n  unselect notify-hosts 0.0.0.0\nend",
+      "default_value": "No SNMP configured",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/325005/basic-configuration"
+      ],
+      "cis_controls": [
+        "v8 12.3",
+        "v7 11.1",
+        "v7 12.2"
+      ]
+    },
+    {
+      "code": "2.3.3",
+      "title": "Disable SNMPv3 Query Per User",
+      "section": "2 System Settings > 2.3 SNMP",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system snmp user > queries",
+      "expected_value": "disable (for users who only accept traps)",
+      "rationale": "SNMP queries can be used for reconnaissance; turn it off on user trap-only.",
+      "audit_procedure": "CLI:\nconfig system snmp user (cek: set queries disable)\n\nGUI: System > SNMP > user > slider Queries.",
+      "remediation_procedure": "CLI:\nconfig system snmp user\n  edit <user>\n  set queries disable\nnext\nend",
+      "default_value": "SNMPv3 user allows Queries",
+      "references": [],
+      "cis_controls": []
+    },
+    {
+      "code": "2.3.4",
+      "title": "Enabling SNMP trap for memory usage",
+      "section": "2 System Settings > 2.3 SNMP",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system snmp sysinfo > trap-free-memory-threshold / trap-freeable-memory-threshold",
+      "expected_value": "Threshold dikonfigurasi (mis. trap-free-memory 20, trap-freeable-memory 50)",
+      "rationale": "Critical memory triggers conserve mode which interferes with security inspections; trap provides early warning.",
+      "audit_procedure": "CLI:\nconfig system snmp sysinfo\nshow   (cek trap-free-memory-threshold & trap-freeable-memory-threshold)",
+      "remediation_procedure": "CLI:\nconfig system snmp sysinfo\n  set status enable\n  set trap-free-memory-threshold 20\n  set trap-freeable-memory-threshold 50\nend",
+      "default_value": "trap-free-memory 5, trap-freeable-memory 60",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/943586"
+      ],
+      "cis_controls": [
+        "v8 8.2",
+        "v7 6.2"
+      ]
+    },
+    {
+      "code": "2.4.1",
+      "title": "Remove default admin user and create one with other name",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Critical",
+      "config_key": "config system admin",
+      "expected_value": "There is no user named 'admin'; default credentials are not valid",
+      "rationale": "Vendor-documented default credentials are therefore the first target of attacks.",
+      "audit_procedure": "CLI/GUI: try logging in with username 'admin' without password; If successful, it means the default is still active.",
+      "remediation_procedure": "1) Create a new admin:\nconfig system admin\n  edit \"mycompanyadmin\"\n  set password <pwd>\n  set accprofile \"super_admin\"\nnext\nend\n2) Verify new account login, then clear default:\nconfig system admin\n  delete \"admin\"\nend",
+      "default_value": "Admin username without password",
+      "references": [
+        "https://kb.fortinet.com/kb/documentLink.do?externalID=FD48763"
+      ],
+      "cis_controls": [
+        "v8 4.7",
+        "v7 4.2"
+      ]
+    },
+    {
+      "code": "2.4.2",
+      "title": "Ensure all the login accounts having specific trusted hosts enabled",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config system admin > trusthost1..N",
+      "expected_value": "Each admin account has a specific trusted host (not 0.0.0.0/0)",
+      "rationale": "Admin access only from trusted network segments; additional layer of security.",
+      "impact": "Akses dari luar segmen diblokir termasuk admin sah (perlu jump host).",
+      "audit_procedure": "CLI:\nconfig system admin\n  edit <akun>\n  show   (cek set trusthost1 ...)\n\nGUI: System > Administrators > akun > 'Restrict login to trusted hosts'.",
+      "remediation_procedure": "CLI:\nconfig system admin\n  edit <akun>\n  set trusthost1 10.0.0.0 255.255.255.0\nend",
+      "default_value": "Each account can be accessed from anywhere (0.0.0.0/0)",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/14906"
+      ],
+      "cis_controls": [
+        "v8 5.4",
+        "v8 12.8",
+        "v7 4.6",
+        "v7 11.6",
+        "v7 11.7"
+      ]
+    },
+    {
+      "code": "2.4.3",
+      "title": "Ensure admin accounts with different privileges have their correct profiles assigned",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config system accprofile + config system admin > accprofile",
+      "expected_value": "Least privilege: each account uses an accprofile according to its role",
+      "rationale": "Different admin levels (tier 1/2/3) require appropriate minimum privileges.",
+      "audit_procedure": "CLI:\nStage 1: config system accprofile > edit <profile> > show full\nStage 2: config system admin > edit <akun> > show full (cek accprofile)\n\nGUI: System > Admin Profiles & Administrators.",
+      "remediation_procedure": "CLI: customize accprofile (e.g. fwgrp custom, set address read-write) then assign to account: set accprofile <profile>.",
+      "default_value": "Only prof_admin & super_admin",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/294491"
+      ],
+      "cis_controls": [
+        "v8 5.4",
+        "v7 4.3"
+      ]
+    },
+    {
+      "code": "2.4.4",
+      "title": "Ensure Admin idle timeout time is configured",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system global > admintimeout",
+      "expected_value": "<= 15 minutes (ideal 5). >15 has a negative impact on the security rating.",
+      "rationale": "Prevents unauthorized access to abandoned GUI sessions.",
+      "audit_procedure": "CLI:\nget system global   (cek admintimeout, dalam menit)\n\nGUI: System > Settings > Administration Settings > Idle timeout.",
+      "remediation_procedure": "CLI:\nconfig system global\n  set admintimeout 5\nend",
+      "default_value": "5 minutes",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/215451"
+      ],
+      "cis_controls": [
+        "v8 5.4",
+        "v7 4.3"
+      ]
+    },
+    {
+      "code": "2.4.5",
+      "title": "Ensure only encrypted access channels are enabled",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config system interface > allowaccess",
+      "expected_value": "allowaccess does not contain http & telnet (only ssh/https)",
+      "rationale": "Only encrypted access to prevent credential sniffing (MiTM).",
+      "audit_procedure": "CLI:\nconfig system interface > edit <iface> > show (cek allowaccess tanpa http/telnet)\n\nGUI: Network > Interfaces > Administrative Access.",
+      "remediation_procedure": "CLI:\nconfig system interface\n  edit <iface>\n  set allowaccess ssh https ping snmp\nend",
+      "default_value": "HTTP & Telnet are not active on any interface",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/574723"
+      ],
+      "cis_controls": [
+        "v8 3.10",
+        "v7 4.5"
+      ]
+    },
+    {
+      "code": "2.4.6",
+      "title": "Apply Local-in Policies",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config firewall local-in-policy",
+      "expected_value": "There is a local-in-policy to control traffic to the FortiGate interface",
+      "rationale": "Local-in policy provides granular control of traffic to the FortiGate interface, beyond trusted hosts.",
+      "impact": "Diproses sebelum trusted host; validasi agar akses manajemen tidak terputus.",
+      "audit_procedure": "CLI:\nconfig firewall local-in-policy\nshow\n\nGUI: aktifkan via System > Feature Visibility > Local-in policies.",
+      "remediation_procedure": "CLI (hanya via CLI):\nconfig firewall local-in-policy\n  edit <id>\n  set intf <iface>\n  set srcaddr <addr>\n  set dstaddr all\n  set action {accept|deny}\n  set service <svc>\n  set schedule always\nnext\nend",
+      "default_value": "There is no local-in-policy by default",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/363127"
+      ],
+      "cis_controls": [
+        "v8 3.3",
+        "v8 12.2",
+        "v7 14.6"
+      ]
+    },
+    {
+      "code": "2.4.7",
+      "title": "Ensure default Admin ports are changed",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system global > admin-port / admin-sport / admin-https-redirect",
+      "expected_value": "admin-port & admin-sport bukan 80/443; admin-https-redirect disable",
+      "rationale": "Changing the default admin port reduces attack surface & port conflicts.",
+      "audit_procedure": "GUI: System > Settings > Administration Settings (cek port).",
+      "remediation_procedure": "CLI:\nconfig system global\n  set admin-https-redirect disable\n  set admin-port 8082\n  set admin-sport 4343\nend\nHindari port: 8080/8081, 4433, 10443.",
+      "default_value": "admin-port 80, admin-sport 443, https-redirect enable",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/616955"
+      ],
+      "cis_controls": [
+        "v8 3.3",
+        "v8 12.2",
+        "v7 9.2",
+        "v7 9.4"
+      ]
+    },
+    {
+      "code": "2.4.8",
+      "title": "Virtual patching on the local-in management interface",
+      "section": "2 System Settings > 2.4 Administrators",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config firewall local-in-policy > virtual-patch",
+      "expected_value": "virtual-patch enable on policies that allow traffic (requires FMWP license)",
+      "rationale": "IPS signature (FMWP) provides virtual patching of GUI/SSH access before official patches are applied.",
+      "audit_procedure": "CLI:\nconfig firewall local-in-policy\nshow   (cek virtual-patch enable)",
+      "remediation_procedure": "CLI:\nconfig firewall local-in-policy\n  edit <id>\n  set virtual-patch enable\nnext\nend",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/393161"
+      ],
+      "cis_controls": [
+        "v8 7.4",
+        "v7 3.5"
+      ]
+    },
+    {
+      "code": "2.5.1",
+      "title": "Ensure High Availability configuration is enabled",
+      "section": "2 System Settings > 2.5 High Availability",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system ha > mode / group-name / hbdev",
+      "expected_value": "a-a or a-p mode; group-name, password, hbdev are configured",
+      "rationale": "HA increases availability & reduces the impact of maintenance/device failure.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek mode, group-name, hbdev)\n\nGUI: System > HA.",
+      "remediation_procedure": "CLI:\nconfig system ha\n  set mode a-p\n  set group-name \"FGT-HA\"\n  set password <pwd>\n  set hbdev port10 50\nend",
+      "default_value": "N/A",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/357558"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "2.5.2",
+      "title": "Ensure \"Monitor Interfaces\" for High Availability devices is enabled",
+      "section": "2 System Settings > 2.5 High Availability",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system ha > monitor",
+      "expected_value": "Critical interfaces are included in the 'monitor set'",
+      "rationale": "Interface monitoring allows failover when the physical media/port has problems.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek set monitor \"portX\" \"portY\")\n\nGUI: System > HA > Monitor Interfaces.",
+      "remediation_procedure": "CLI:\nconfig system ha\n  set monitor \"port6\" \"port7\"\nend",
+      "default_value": "N/A",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/6.0.0/best-practices/498515/interface-monitoring-port-monitoring"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "2.5.3",
+      "title": "Ensure HA Reserved Management Interface is configured",
+      "section": "2 System Settings > 2.5 High Availability",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system ha > ha-mgmt-status / ha-mgmt-interfaces",
+      "expected_value": "ha-mgmt-status enable + minimal 1 interface & gateway",
+      "rationale": "So that primary & secondary can be accessed directly without sharing a virtual MAC.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek ha-mgmt-status enable & ha-mgmt-interfaces)\n\nGUI: System > HA > Management Interface Reservation.",
+      "remediation_procedure": "CLI:\nconfig system ha\n  set ha-mgmt-status enable\n  config ha-mgmt-interfaces\n    edit 1\n      set interface port6\n      set gateway 10.10.10.1\n  end\nend",
+      "default_value": "N/A",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/313152"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "2.5.4",
+      "title": "Ensure High Availability Group-ID is configured",
+      "section": "2 System Settings > 2.5 High Availability",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config system ha > group-id",
+      "expected_value": "group-id is not default 0 (0-1023)",
+      "rationale": "Group-ID generates virtual MAC; non-default prevents MAC duplication in L2.",
+      "audit_procedure": "CLI:\nshow sys ha   (cek set group-id != 0)\n\nGUI: System > HA > Cluster Settings > Group ID.",
+      "remediation_procedure": "CLI:\nconfig system ha\n  set group-id 10\nend",
+      "default_value": "group-id 0",
+      "references": [],
+      "cis_controls": []
+    },
+    {
+      "code": "3.1",
+      "title": "Ensure that unused policies are reviewed regularly",
+      "section": "3 Policy and Objects",
+      "cis_level": "L2",
+      "cis_status": "Manual",
+      "system_check": "manual",
+      "severity": "Medium",
+      "config_key": "Hit count (diag firewall iprope) - runtime",
+      "expected_value": "No-hit policy reviewed; disable/unused log (review 2x/year)",
+      "rationale": "Keeps the rule base slim & prevents traffic from being accidentally allowed/blocked.",
+      "audit_procedure": "CLI:\ndiag firewall iprope show 100004 <policy_id>\ndiag firewall iprope clear 100004 <policy_id>\n\nGUI: Policy & Objects > Firewall Policy > kolom Hit Count/Bytes.",
+      "remediation_procedure": "Review & delete/disable unused policies based on hit count.",
+      "default_value": "Hit count 0 at start",
+      "references": [
+        "https://kb.fortinet.com/kb/documentLink.do?externalID=FD44631"
+      ],
+      "cis_controls": [
+        "v8 4.8",
+        "v7 9.2",
+        "v7 11.2"
+      ]
+    },
+    {
+      "code": "3.2",
+      "title": "Ensure that policies do not use \"ALL\" as Service",
+      "section": "3 Policy and Objects",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config firewall policy > service",
+      "expected_value": "There is no policy with service 'ALL'",
+      "rationale": "Prevents the firewall from accidentally allowing unauthorized protocols/services.",
+      "audit_procedure": "CLI:\nconfig firewall policy\nshow   (cek tidak ada set service \"ALL\")\n\nGUI: Policy & Objects > Firewall Policy.",
+      "remediation_procedure": "CLI:\nconfig firewall policy\n  edit <id>\n  set service \"FTP\" \"SNMP\"   (ganti dengan service spesifik)\nend",
+      "default_value": "Policy baru default service 'ALL'",
+      "references": [],
+      "cis_controls": [
+        "v8 3.3",
+        "v7 9.2"
+      ]
+    },
+    {
+      "code": "3.3",
+      "title": "Ensure firewall policy denying all traffic to/from Tor, malicious server, or scanner IP addresses using ISDB",
+      "section": "3 Policy and Objects",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "High",
+      "config_key": "config firewall policy > ISDB objects",
+      "expected_value": "Ada policy deny inbound & outbound untuk ISDB (Tor, Botnet-C&C, Phishing, Proxy, Spam, Anonymous VPN, Malicious, Scanner)",
+      "rationale": "Filter malicious traffic as the first layer without heavy processes like IPS.",
+      "audit_procedure": "GUI: Policy & Objects > cek policy deny inbound (source ISDB) & outbound (destination ISDB) dengan logging enabled.",
+      "remediation_procedure": "Buat 2 policy deny: (1) Inbound - source = ISDB list, action Deny, log enable; (2) Outbound - destination = ISDB list, action Deny, log enable. (ISDB list per Dec 2024/FortiOS 7.4.5)",
+      "default_value": "There isn't any",
+      "references": [],
+      "cis_controls": [
+        "v8 12.2",
+        "v7 12.2",
+        "v7 12.3",
+        "v7 13.3"
+      ]
+    },
+    {
+      "code": "3.4",
+      "title": "Ensure logging is enabled on all firewall policies",
+      "section": "3 Policy and Objects",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config firewall policy > logtraffic",
+      "expected_value": "Allow policy: log all sessions; Deny policy: log violation traffic (termasuk implicit deny)",
+      "rationale": "Logging of all policies enables SOC/IR investigations & threat hunting.",
+      "impact": "Default logging tidak aktif; menciptakan data gap.",
+      "audit_procedure": "GUI: Policy & Objects > Firewall Policy (validasi logging enabled di semua policy).",
+      "remediation_procedure": "Untuk allow: 'Log Allowed Traffic' = All Sessions. Untuk deny: 'Log Violation Traffic' = enable.",
+      "default_value": "Logging disabled",
+      "references": [],
+      "cis_controls": [
+        "v8 8.1",
+        "v8 13.6",
+        "v7 12.5",
+        "v7 12.8"
+      ]
+    },
+    {
+      "code": "FW-ANY",
+      "title": "(Extra, non-CIS) Any-Any-Any firewall policy detected",
+      "section": "3 Policy and Objects",
+      "cis_level": null,
+      "cis_status": null,
+      "system_check": "auto",
+      "severity": "Critical",
+      "config_key": "config firewall policy > srcaddr=all & dstaddr=all & service=ALL",
+      "expected_value": "There is no policy with src=all, dst=all, service=ALL",
+      "rationale": "The any-any-any policy opens up a very wide attack surface; complement 3.2 & 3.4.",
+      "audit_procedure": "Parser cek setiap policy: srcaddr 'all' & dstaddr 'all' & service 'ALL' & action accept.",
+      "remediation_procedure": "Restrict src/dst to specific subnet/host, change specific services, enable security profile & logging.",
+      "default_value": "-",
+      "references": [],
+      "cis_controls": []
+    },
+    {
+      "code": "4.1.1",
+      "title": "Detect Botnet connections",
+      "section": "4 Security Profiles > 4.1 IPS",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "High",
+      "config_key": "IPS profile > scan-botnet-connections",
+      "expected_value": "Block outgoing botnet, applied to policy with WAN destination",
+      "rationale": "Block outgoing connections to the botnet as part of defense-in-depth.",
+      "audit_procedure": "GUI: ensure IPS profile 'Scan Outgoing Connections to Botnet Sites' = Block; review the policy with the WAN destination.",
+      "remediation_procedure": "GUI: set IPS profile botnet = Block; apply IPS profile to all outbound traffic policies to the WAN.",
+      "default_value": "Disabled pada default profile",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/668865"
+      ],
+      "cis_controls": [
+        "v8 13.7",
+        "v8 13.8",
+        "v7 12.7",
+        "v7 15.3"
+      ]
+    },
+    {
+      "code": "4.1.2",
+      "title": "Apply IPS Security Profile to Policies",
+      "section": "4 Security Profiles > 4.1 IPS",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "High",
+      "config_key": "config firewall policy > ips-sensor",
+      "expected_value": "IPS profile is applied to inter-interface policy (allowed)",
+      "rationale": "Traffic between interfaces must be inspected by IPS.",
+      "audit_procedure": "Review all firewall policies: ensure there is an IPS security profile for inspection.",
+      "remediation_procedure": "Apply the appropriate IPS security profile to all 'Allowed' policies.",
+      "default_value": "Not Configured",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/243446"
+      ],
+      "cis_controls": [
+        "v8 7.5",
+        "v7 12.7"
+      ]
+    },
+    {
+      "code": "4.2.1",
+      "title": "Ensure Antivirus Definition Push Updates are Configured",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config system autoupdate schedule",
+      "expected_value": "Scheduled updates = Automatic",
+      "rationale": "Ensure that the AV database signature is always up to date from FortiGuard.",
+      "audit_procedure": "GUI: System > FortiGuard > Scheduled updates = Automatic.\nCLI: config system autoupdate schedule > show (kosong = automatic).",
+      "remediation_procedure": "CLI:\nconfig system autoupdate schedule\n  set status enable\n  set frequency automatic\nend",
+      "default_value": "Enabled & automatic",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/547335"
+      ],
+      "cis_controls": [
+        "v8 10.2",
+        "v7 8.2"
+      ]
+    },
+    {
+      "code": "4.2.2",
+      "title": "Apply Antivirus Security Profile to Policies",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "High",
+      "config_key": "config firewall policy > av-profile",
+      "expected_value": "AV profile is applied to the relevant policy",
+      "rationale": "Traffic between interfaces must be inspected by antivirus.",
+      "audit_procedure": "Review all firewall policies: make sure there is an AV security profile.",
+      "remediation_procedure": "Apply the appropriate AV security profile to the relevant policy.",
+      "default_value": "There is no inspection on the policy",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/243446"
+      ],
+      "cis_controls": [
+        "v8 10.1",
+        "v8 10.6",
+        "v7 8.2"
+      ]
+    },
+    {
+      "code": "4.2.3",
+      "title": "Enable Outbreak Prevention Database",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config antivirus profile > outbreak-prevention",
+      "expected_value": "outbreak-prevention block for each protocol",
+      "rationale": "Adds a FortiGuard signature hash layer on top of signature-based AV.",
+      "audit_procedure": "GUI: Security Profiles > AntiVirus > 'Use FortiGuard outbreak prevention database' enabled.\nCLI: config antivirus profile > show.",
+      "remediation_procedure": "Activate 'Use FortiGuard outbreak prevention database' in the AV profile (set outbreak-prevention block).",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/889364"
+      ],
+      "cis_controls": [
+        "v8 10.1",
+        "v8 10.6",
+        "v7 8.1",
+        "v7 8.2"
+      ]
+    },
+    {
+      "code": "4.2.4",
+      "title": "Enable AI/heuristic based malware detection",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config antivirus settings > machine-learning-detection",
+      "expected_value": "enable",
+      "rationale": "AI model detects potentially malicious Windows PEs for zero-day mitigation.",
+      "audit_procedure": "CLI:\nshow antivirus settings | grep machine-learning-detection",
+      "remediation_procedure": "CLI:\nconfig antivirus settings\n  set machine-learning-detection enable\nend",
+      "default_value": "Enabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/252375733/config-antivirus-settings"
+      ],
+      "cis_controls": [
+        "v8 10.7",
+        "v7 8.1",
+        "v7 8.2",
+        "v7 8.3"
+      ]
+    },
+    {
+      "code": "4.2.5",
+      "title": "Enable grayware detection on antivirus",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config antivirus settings > grayware",
+      "expected_value": "enable",
+      "rationale": "Grayware can be used for malicious purposes; signature is updated like AV.",
+      "audit_procedure": "CLI:\nshow antivirus settings | grep grayware",
+      "remediation_procedure": "CLI:\nconfig antivirus settings\n  set grayware enable\nend",
+      "default_value": "Enabled on 7.4+ (older versions: disabled)",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/252375733/config-antivirus-settings"
+      ],
+      "cis_controls": [
+        "v8 10.1",
+        "v8 10.6",
+        "v7 8.1",
+        "v7 8.2"
+      ]
+    },
+    {
+      "code": "4.2.6",
+      "title": "Ensure inline scanning with FortiGuard AI-Based Sandbox Service is enabled",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config system fortiguard > sandbox-inline-scan + AV profile fortisandbox",
+      "expected_value": "sandbox-inline-scan enable + AV profile fortisandbox-mode inline & fortisandbox block",
+      "rationale": "Cloud sandbox (FAIS) detects unknown malware & prevents patient zero (requires FAIS license).",
+      "audit_procedure": "CLI: config system fortiguard > get (cek sandbox-inline-scan enabled); config antivirus profile > show (cek fortisandbox-mode inline, fortisandbox block).\nGUI: Security Fabric > Fabric Connectors > Cloud Sandbox (Inline scan); AntiVirus profile Scan strategy=Inline, Action=Block.",
+      "remediation_procedure": "GUI: aktifkan FortiGate Cloud Sandbox (Feature Visibility), set Fabric Connector Cloud Sandbox + Region + Inline scan, buat AV profile Proxy-based, Send files to FortiSandbox, Scan strategy Inline, Action Block.",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/571153/using-fortisandbox-inline-scanning-with-antivirus"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "4.2.7",
+      "title": "Enable CDR for proxy mode on XLSB, OpenOffice, and RTF files",
+      "section": "4 Security Profiles > 4.2 Antivirus",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config antivirus profile (proxy) > Content Disarm and Reconstruction",
+      "expected_value": "CDR is active for office files (XLSB, OpenOffice, RTF) in AV profile proxy-mode",
+      "rationale": "CDR sanitizes malicious content in documents before it reaches the user.",
+      "impact": "Tanpa CDR, payload di dokumen dapat lolos ke user.",
+      "audit_procedure": "GUI: Security Profiles > AntiVirus > Proxy-based > APT Protection Options > Content Disarm and Reconstruction > 'Apply CDR to office files' enabled.",
+      "remediation_procedure": "GUI: buat AV profile Proxy-based, aktifkan CDR & 'Apply CDR to office files' (Office/OpenOffice/RTF/XLSB).",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.0/new-features/920942/support-xlsb-openoffice-and-rtf-files-for-cdr-in-antivirus-profiles-7-4-4"
+      ],
+      "cis_controls": [
+        "v8 10.1",
+        "v7 8.1"
+      ]
+    },
+    {
+      "code": "4.3.1",
+      "title": "Enable Botnet C&C Domain Blocking DNS Filter",
+      "section": "4 Security Profiles > 4.3 DNS Filter",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config dnsfilter profile > redirect botnet C&C",
+      "expected_value": "'Redirect botnet C&C requests to Block Portal' enable + diterapkan pada policy DNS",
+      "rationale": "Block botnets at the DNS resolution stage as an additional layer of defense.",
+      "audit_procedure": "GUI: Security Profiles > DNS Filter > 'Redirect botnet C&C requests to Block Portal' enabled; pastikan policy DNS pakai DNS Filter profile.",
+      "remediation_procedure": "GUI: activate the option in the DNS Filter profile & apply it to the DNS policy.",
+      "default_value": "Enabled pada default profile",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/105208"
+      ],
+      "cis_controls": [
+        "v8 9.2",
+        "v7 8.6",
+        "v7 8.7"
+      ]
+    },
+    {
+      "code": "4.3.2",
+      "title": "Ensure DNS Filter logs all DNS queries and responses",
+      "section": "4 Security Profiles > 4.3 DNS Filter",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config dnsfilter profile > log-all-domain",
+      "expected_value": "log-all-domain enable",
+      "rationale": "Log all DNS queries/responses for SOC/IR investigations.",
+      "impact": "Default: allowed DNS tidak dilog (data gap).",
+      "audit_procedure": "GUI: Security Profiles > DNS Filter > 'Log all DNS queries and responses' enabled.\nCLI: config dnsfilter profile > show (set log-all-domain enable).",
+      "remediation_procedure": "Aktifkan 'Log all DNS queries and responses' pada DNS Filter profile.",
+      "default_value": "Disabled",
+      "references": [
+        "https://community.fortinet.com/t5/FortiGate/Technical-Tip-FortiGate-Static-DNS-filter-behavior-in-logging/ta-p/223110"
+      ],
+      "cis_controls": [
+        "v8 8.6",
+        "v7 8.7"
+      ]
+    },
+    {
+      "code": "4.3.3",
+      "title": "Apply DNS Filter Security Profile to Policies",
+      "section": "4 Security Profiles > 4.3 DNS Filter",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config firewall policy > dnsfilter-profile",
+      "expected_value": "DNS Filter profile is applied to the outbound policy to the Internet",
+      "rationale": "Outbound traffic to the Internet must be inspected by the DNS Filter.",
+      "audit_procedure": "Review the outbound policy to the Internet: make sure there is a DNS Filter security profile.",
+      "remediation_procedure": "Apply the DNS Filter profile to the 'Allowed' outbound to the Internet policy.",
+      "default_value": "Not Configured",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/243446"
+      ],
+      "cis_controls": [
+        "v8 9.2",
+        "v7 7.7"
+      ]
+    },
+    {
+      "code": "4.4.1",
+      "title": "Create a Web Filtering Profile",
+      "section": "4 Security Profiles > 4.4 Web Filtering",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config webfilter profile > Security Risk categories",
+      "expected_value": "Kategori Security Risk (Malicious Websites, Phishing, Spam URLs) = Block",
+      "rationale": "The Security Risk category is often an attack vector (malware, phishing, C2).",
+      "impact": "Set 'Newly Observed/Registered Domains' ke Block dapat memblokir website baru/uncategorized.",
+      "audit_procedure": "GUI: Security Profiles > Web Filter > pastikan Security Risk (Malicious/Phishing/Spam URLs) = Block.",
+      "remediation_procedure": "Apply Web Filter profile to policy/SD-WAN; set Security Risk categories = Block.",
+      "default_value": "Semua kategori Security Risk & Unrated default Block",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.6.2/administration-guide/267887/configuring-a-web-filter-profile"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "4.5.1",
+      "title": "Block high risk categories on Application Control",
+      "section": "4 Security Profiles > 4.5 Application Control",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config application list > P2P/Proxy",
+      "expected_value": "Kategori P2P & Proxy = Block",
+      "rationale": "P2P/Proxy applications are known to spread malware & can bypass inspections.",
+      "audit_procedure": "GUI: Security Profiles > Application Control > pastikan P2P & Proxy = Block.",
+      "remediation_procedure": "Set the P2P & Proxy category = Block in the App Control profile.",
+      "default_value": "All default categories 'Monitor'",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/19814"
+      ],
+      "cis_controls": [
+        "v8 13.10",
+        "v7 9.5"
+      ]
+    },
+    {
+      "code": "4.5.2",
+      "title": "Block applications running on non-default ports",
+      "section": "4 Security Profiles > 4.5 Application Control",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config application list > enforce-default-app-port",
+      "expected_value": "enable",
+      "rationale": "Applications on non-default ports may indicate data exfiltration (e.g. HTTPS on 10443).",
+      "audit_procedure": "GUI: Security Profiles > Application Control > 'Block applications detected on non-default ports' enabled.",
+      "remediation_procedure": "CLI:\nconfig application list\n  edit <profile>\n  set enforce-default-app-port enable\nend",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/66882"
+      ],
+      "cis_controls": []
+    },
+    {
+      "code": "4.5.3",
+      "title": "Ensure all Application Control related traffic is logged",
+      "section": "4 Security Profiles > 4.5 Application Control",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "auto",
+      "severity": "Low",
+      "config_key": "config application list > tidak ada action 'Allow'",
+      "expected_value": "There are no 'Allow' action categories (use Monitor/Block), including Unknown Applications",
+      "rationale": "The 'Allow' action is not logged, creating a visibility gap.",
+      "impact": "Visibility gap mempengaruhi forensik & respons insiden.",
+      "audit_procedure": "GUI: Security Profiles > Application Control > make sure there is no 'Allow' action.",
+      "remediation_procedure": "Change all categories with action 'Allow' to 'Monitor'.",
+      "default_value": "Kategori 'Unknown Applications' = Allow",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/19814"
+      ],
+      "cis_controls": [
+        "v8 13.6",
+        "v7 6.3"
+      ]
+    },
+    {
+      "code": "4.5.4",
+      "title": "Apply Application Control Security Profile to Policies",
+      "section": "4 Security Profiles > 4.5 Application Control",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config firewall policy > application-list",
+      "expected_value": "App Control profile is applied to inter-interface policy (allowed)",
+      "rationale": "Traffic between interfaces must be inspected by Application Control.",
+      "audit_procedure": "Review all firewall policies: make sure there is an Application Control security profile.",
+      "remediation_procedure": "Apply the appropriate App Control security profile to all 'Allowed' policies.",
+      "default_value": "Not Configured",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/243446"
+      ],
+      "cis_controls": [
+        "v8 3.3",
+        "v7 9.5",
+        "v7 18.10"
+      ]
+    },
+    {
+      "code": "5.1.1",
+      "title": "Enable Compromised Host Quarantine",
+      "section": "5 Security Fabric > 5.1 Automation",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "Medium",
+      "config_key": "config system automation-stitch > Compromised Host Quarantine",
+      "expected_value": "Automation stitch 'Compromised Host Quarantine' status enable (jika pakai Fabric ecosystem)",
+      "rationale": "Karantina otomatis host high-severity pada FortiAP/FortiSwitch/FortiClient EMS.",
+      "audit_procedure": "GUI: Security Fabric > Automation > pastikan 'Compromised Host Quarantine' enabled.",
+      "remediation_procedure": "GUI: Security Fabric > Automation > ubah Disabled ke Enabled (butuh FortiAP/FortiSwitch/FortiClient EMS).",
+      "default_value": "Not enabled",
+      "references": [],
+      "cis_controls": [
+        "v8 13.5",
+        "v8 13.9",
+        "v7 8.1",
+        "v7 8.3"
+      ]
+    },
+    {
+      "code": "5.2.1.1",
+      "title": "Ensure Security Fabric is Configured",
+      "section": "5 Security Fabric > 5.2 Fabric Connectors",
+      "cis_level": "L2",
+      "cis_status": "Manual",
+      "system_check": "semi",
+      "severity": "Low",
+      "config_key": "Security Fabric Setup > root FortiGate",
+      "expected_value": "Root FortiGate status enable, role 'Serve as Fabric Root' (if Fabric feature is used)",
+      "rationale": "Without FortiGate root, Security Fabric does not work.",
+      "impact": "Tanpa Fabric, visibilitas & manajemen trafik menurun.",
+      "audit_procedure": "GUI: Security Fabric > Fabric Connectors > Security Fabric Setup (status enabled, role Fabric Root, FortiAnalyzer & fabric name diisi).",
+      "remediation_procedure": "GUI: set root FortiGate enable + role 'Serve as Fabric Root', konfigurasi FortiAnalyzer & fabric name + interface join.",
+      "default_value": "Disabled",
+      "references": [],
+      "cis_controls": []
+    },
+    {
+      "code": "6.1.1",
+      "title": "Apply a Trusted Signed Certificate for VPN Portal",
+      "section": "6 VPN > 6.1 SSL VPN",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "semi",
+      "severity": "High",
+      "config_key": "config vpn ssl settings > servercert",
+      "expected_value": "Server Certificate = certificate from a trusted CA (not self-signed/factory)",
+      "rationale": "MiTM vulnerable self-signed certificates & connections to untrusted servers.",
+      "audit_procedure": "GUI: VPN > SSL-VPN Settings > 'Server Certificate' = sertifikat signed.",
+      "remediation_procedure": "GUI: System > Certificates > Import; then VPN > SSL-VPN Settings > select the signed Server Certificate.",
+      "default_value": "Self-signed factory certificate",
+      "references": [],
+      "cis_controls": [
+        "v8 12.7",
+        "v7 1.8"
+      ]
+    },
+    {
+      "code": "6.1.2",
+      "title": "Enable Limited TLS Versions for SSL VPN",
+      "section": "6 VPN > 6.1 SSL VPN",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config vpn ssl settings > ssl-max-proto-ver / ssl-min-proto-ver / algorithm",
+      "expected_value": "ssl-max-proto-ver tls1-3, ssl-min-proto-ver tls1-2, algorithm high",
+      "rationale": "Restricting TLS to secure versions & strong ciphers increases the security of SSL VPN connections.",
+      "audit_procedure": "CLI:\nconfig vpn ssl settings\nget\nValidate:\n  ssl-max-proto-ver = tls1-3\n  ssl-min-proto-ver = tls1-2\n  algorithm = high",
+      "remediation_procedure": "CLI:\nconfig vpn ssl settings\n  set ssl-max-proto-ver tls1-3\n  set ssl-min-proto-ver tls1-2\n  set algorithm high\nend",
+      "default_value": "ssl-max-proto-ver: tls1-3, ssl-min-proto-ver: tls1-2, algorithm: high",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/114404382/config-vpn-ssl-settings"
+      ],
+      "cis_controls": [
+        "v8 12.7"
+      ]
+    },
+    {
+      "code": "7.1.1",
+      "title": "Enable Event Logging",
+      "section": "7 Logs and Reports > 7.1 Enable Logging",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config log eventfilter > event",
+      "expected_value": "event enable (all event types)",
+      "rationale": "Event logging generates logs for review/audit & ingest to SIEM/Analyzer.",
+      "audit_procedure": "CLI:\nconfig log eventfilter\nget   (validasi semua event enabled)",
+      "remediation_procedure": "GUI: Log & Report > Log Settings > enable 'All' Event Logging.\nCLI:\nconfig log eventfilter\n  set event enable\nend",
+      "default_value": "Enabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/250999"
+      ],
+      "cis_controls": [
+        "v8 8.2",
+        "v8 8.5",
+        "v8 8.9",
+        "v7 6.2",
+        "v7 6.3",
+        "v7 8.8"
+      ]
+    },
+    {
+      "code": "7.2.1",
+      "title": "Centralized Logging and Reporting",
+      "section": "7 Logs and Reports > 7.2 Centralized Logging",
+      "cis_level": "L2",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "High",
+      "config_key": "config log syslogd setting / config log fortianalyzer setting",
+      "expected_value": "Logs sent to centralized devices (SIEM/Syslog/FortiAnalyzer/FortiManager)",
+      "rationale": "Centralized logging provides more reliable retention & richer data for review.",
+      "audit_procedure": "GUI: Log & Report > Log Settings > cek 'Syslog logging' offload ke device lain.",
+      "remediation_procedure": "GUI: Log & Report > Log Settings > remote server configuration in 'Syslog logging'.",
+      "default_value": "Not configured",
+      "references": [
+        "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/250999"
+      ],
+      "cis_controls": [
+        "v8 8.1",
+        "v8 8.9",
+        "v7 6.3",
+        "v7 8.6"
+      ]
+    },
+    {
+      "code": "7.3.1",
+      "title": "Encrypt Log Transmission to FortiAnalyzer / FortiManager",
+      "section": "7 Logs and Reports > 7.3 Encrypt Logs in Transit",
+      "cis_level": "L1",
+      "cis_status": "Automated",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config log fortianalyzer setting > reliable / enc-algorithm",
+      "expected_value": "reliable enable & enc-algorithm high",
+      "rationale": "Encryption of logs to FAZ/FMG prevents logs from being intercepted in transit.",
+      "audit_procedure": "CLI:\nconfig log fortianalyzer setting\nget   (validasi enc-algorithm high & reliable enable)",
+      "remediation_procedure": "CLI:\nconfig log fortianalyzer setting\n  set reliable enable\n  set enc-algorithm high\nend",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortianalyzer/7.4.5/administration-guide/410387"
+      ],
+      "cis_controls": [
+        "v8 3.10",
+        "v7 14.4"
+      ]
+    },
+    {
+      "code": "7.3.2",
+      "title": "Encrypt Log Transmission to Syslog",
+      "section": "7 Logs and Reports > 7.3 Encrypt Logs in Transit",
+      "cis_level": "L1",
+      "cis_status": "Manual",
+      "system_check": "auto",
+      "severity": "Medium",
+      "config_key": "config log syslog setting > reliable / enc-algorithm",
+      "expected_value": "reliable enable & enc-algorithm high",
+      "rationale": "Encryption of logs to syslog prevents logs from being intercepted in transit.",
+      "note_dedup": "CIS 7.3.3 identik dengan 7.3.2 (editorial duplicate). Implementasikan HANYA sekali agar tidak double-penalty.",
+      "audit_procedure": "CLI:\nconfig log syslog setting\nget   (validasi enc-algorithm high & reliable enable)",
+      "remediation_procedure": "CLI:\nconfig log syslog setting\n  set reliable enable\n  set enc-algorithm high\nend",
+      "default_value": "Disabled",
+      "references": [
+        "https://docs.fortinet.com/document/fortianalyzer/7.4.5/administration-guide/410387"
+      ],
+      "cis_controls": [
+        "v8 3.10",
+        "v7 14.4"
+      ]
+    }
+  ]
+}

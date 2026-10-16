@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  password           String
+  role               String   @default("admin")
+  mustChangePassword Boolean  @default(true)
+  createdAt          DateTime @default(now())
+}
+
+model Company {
+  id                  String   @id @default(cuid())
+  name                String
+  contact_person      String
+  contact_email       String
+  industry            String
+  notes               String
+  devices_count       Int      @default(0)
+  latest_score        Float    @default(0)
+  latest_grade        String   @default("F")
+  open_findings_count Int      @default(0)
+  avatar_initials     String
+  created_at          DateTime @default(now())
+
+  devices             Device[]
+  reports             Report[]
+}
+
+model Device {
+  id               String   @id @default(cuid())
+  company_id       String
+  vendor           String
+  model            String
+  os_version       String
+  hostname         String
+  serial           String
+  ha_status        String
+  location         String
+  last_backup_date String
+  last_audit_date  String?
+  latest_score     Float?
+  latest_grade     String?
+
+  company          Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+}
+
+model Audit {
+  id               String   @id @default(cuid())
+  company_id       String
+  device_id        String
+  status           String
+  score            Float
+  grade            String
+  created_at       DateTime @default(now())
+  
+  // Storing the entire AuditResult object as JSON
+  data             String
+  
+  framework_results AuditFrameworkResult[]
+}
+
+model Report {
+  id           String   @id @default(cuid())
+  audit_id     String
+  company_id   String
+  company_name String
+  device_name  String
+  type         String
+  score        Float
+  grade        String
+  finalized    Boolean  @default(false)
+  created_at   DateTime @default(now())
+  
+  // We can store a snapshot JSON for the full report details
+  snapshot     String?
+
+  company      Company  @relation(fields: [company_id], references: [id], onDelete: Cascade)
+}
+
+model Framework {
+  id              String   @id @default(uuid())
+  code            String   @unique
+  name            String
+  version         String?
+  description     String?
+  is_technical    Boolean  @default(false)
+  active          Boolean  @default(true)
+  created_at      DateTime @default(now())
+
+  controls        FrameworkControl[]
+  audit_results   AuditFrameworkResult[]
+}
+
+model FrameworkControl {
+  id              String   @id @default(uuid())
+  framework_id    String
+  control_code    String
+  title           String
+  category        String?
+  description     String?
+  coverage_type   String   @default("manual")
+  guidance        String?
+  created_at      DateTime @default(now())
+
+  framework       Framework @relation(fields: [framework_id], references: [id], onDelete: Cascade)
+  mappings        ControlRuleMapping[]
+
+  @@unique([framework_id, control_code])
+}
+
+model ControlRuleMapping {
+  id                   String   @id @default(uuid())
+  framework_control_id String
+  rule_code            String
+  rule_vendor          String   @default("fortigate")
+  mapping_strength     String?  @default("full")
+  note                 String?
+  created_at           DateTime @default(now())
+
+  framework_control    FrameworkControl @relation(fields: [framework_control_id], references: [id], onDelete: Cascade)
+
+  @@unique([framework_control_id, rule_code, rule_vendor])
+}
+
+model AuditFrameworkResult {
+  id                   String   @id @default(uuid())
+  audit_id             String
+  framework_id         String
+  score                Float?
+  covered_controls     Int?
+  total_controls       Int?
+  coverage_percent     Float?
+  breakdown_json       String   @default("{}")
+  created_at           DateTime @default(now())
+
+  audit                Audit    @relation(fields: [audit_id], references: [id], onDelete: Cascade)
+  framework            Framework @relation(fields: [framework_id], references: [id])
+
+  @@unique([audit_id, framework_id])
+}
+
+model AppSettings {
+  id         String   @id @default("app-settings")
+  ai_config  String   @default("{}")
+  updated_at DateTime @updatedAt
+}

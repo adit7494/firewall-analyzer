@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "description": "Seed framework and control lists for Firewall Audit Analyzer. Loaded into `frameworks` and `framework_controls` tables. Importer must be idempotent (upsert by frameworks.code and framework_controls(framework_id, control_code)).",
+    "generated": "2026-07-28",
+    "coverage_legend": {
+      "automated": "Control can be fully assessed from config via mapped CIS rules.",
+      "partial": "Some aspects of the control are covered by CIS rules; the rest require judgment/manual verification.",
+      "manual": "Governance/process controls (policies, training, reviews) - cannot be derived from config; auditor fills manually.",
+      "not_covered": "Outside the scope of firewall config audit (e.g. physical security/HR) - displayed transparently, excluded from scoring."
+    },
+    "IMPORTANT_NOTE_FOR_AI": "Control codes (e.g. 'PR.AA-01', 'A.8.20', 'Req 1.2.1', 'AC-domain') are working representations based on public understanding of each framework. Before using for official audit/certification, verify control codes & titles against the latest official framework documents (especially Cyber Trust Mark CSA & PCI DSS v4.0.1). coverage_type is intentionally marked conservative (partial/manual) when in doubt."
+  },
+  "frameworks": [
+    {
+      "code": "CIS",
+      "name": "CIS FortiGate Benchmark",
+      "version": "7.4.x v1.0.1",
+      "is_technical": true,
+      "description": "Technical source of truth. Granular rules based on FortiOS configuration. Other frameworks map to these rules.",
+      "controls": []
+    },
+
+    {
+      "code": "CTM",
+      "name": "Cyber Trust Mark (CSA Singapore)",
+      "version": "working-2026",
+      "is_technical": false,
+      "description": "CSA Singapore certification mark based on cyber readiness domains (risk-based). Firewall focus: secure configuration, access control, logging, network security, patching. Many domains are governance-related (manual).",
+      "controls": [
+        { "control_code": "CTM-AC",   "title": "Access Control", "category": "Protect", "coverage_type": "partial",  "description": "Admin account management, least privilege, MFA, trusted hosts, timeouts.", "guidance": "External MFA & AAA are not always visible in static config; verify manually if necessary." },
+        { "control_code": "CTM-SC",   "title": "Secure/Hardened Configuration", "category": "Protect", "coverage_type": "automated", "description": "Baseline hardening: strong encryption, TLS, admin ports, USB auto-install, banners." },
+        { "control_code": "CTM-NS",   "title": "Network Security", "category": "Protect", "coverage_type": "partial", "description": "Segmentation, policies without ANY, blocking malicious IPs (ISDB), WAN management access." },
+        { "control_code": "CTM-SP",   "title": "Security Profiles / Threat Protection", "category": "Detect", "coverage_type": "partial", "description": "IPS, AV, Web/DNS/App controls applied to policies." },
+        { "control_code": "CTM-LOG",  "title": "Logging & Monitoring", "category": "Detect", "coverage_type": "automated", "description": "Event logging, centralized logging, log transit encryption." },
+        { "control_code": "CTM-VPN",  "title": "Secure Remote Access (VPN)", "category": "Protect", "coverage_type": "partial", "description": "SSL VPN with trusted certificates & strong TLS." },
+        { "control_code": "CTM-PATCH","title": "Update & Patch Management", "category": "Identify", "coverage_type": "partial", "description": "Latest firmware, auto-update signatures, virtual patching." },
+        { "control_code": "CTM-BCP",  "title": "Availability / Resilience (HA)", "category": "Recover", "coverage_type": "partial", "description": "High Availability & interface monitoring." },
+        { "control_code": "CTM-GOV",  "title": "Governance & Risk Management", "category": "Govern", "coverage_type": "manual", "description": "Security policies, risk management, asset ownership.", "guidance": "Requires policy documents & process evidence - auditor must fill manually." },
+        { "control_code": "CTM-TRN",  "title": "Security Awareness & Training", "category": "Govern", "coverage_type": "not_covered", "description": "Staff cyber awareness training.", "guidance": "Outside the scope of firewall configuration audits." },
+        { "control_code": "CTM-IR",   "title": "Incident Response", "category": "Respond", "coverage_type": "manual", "description": "Incident response procedures & readiness.", "guidance": "Logging supports IR, but IR procedures are assessed manually." },
+        { "control_code": "CTM-BACKUP","title": "Data Backup", "category": "Recover", "coverage_type": "manual", "description": "Configuration & data backups.", "guidance": "Firewall config backups should be verified manually (not always present in config)." }
+      ]
+    },
+
+    {
+      "code": "NIST_CSF",
+      "name": "NIST Cybersecurity Framework 2.0",
+      "version": "2.0",
+      "is_technical": false,
+      "description": "Outcome-based framework with 6 functions: Govern, Identify, Protect, Detect, Respond, Recover. Firewalls primarily address Protect & Detect.",
+      "controls": [
+        { "control_code": "GV.PO-01", "title": "Policy for managing cybersecurity risk is established", "category": "Govern", "coverage_type": "manual", "guidance": "Written policies - manual verification." },
+        { "control_code": "GV.RM-01", "title": "Risk management objectives are established", "category": "Govern", "coverage_type": "manual" },
+        { "control_code": "ID.AM-01", "title": "Inventories of hardware are maintained", "category": "Identify", "coverage_type": "partial", "description": "Config hostnames/assets aid inventory; full inventory process is manual." },
+        { "control_code": "ID.RA-01", "title": "Vulnerabilities in assets are identified", "category": "Identify", "coverage_type": "partial", "description": "Firmware/patch status." },
+        { "control_code": "PR.AA-01", "title": "Identities and credentials are managed", "category": "Protect", "coverage_type": "automated", "description": "Admin accounts, password policies, default admins." },
+        { "control_code": "PR.AA-05", "title": "Access permissions incorporate least privilege & separation of duties", "category": "Protect", "coverage_type": "partial", "description": "Admin profiles, trusted hosts, timeouts." },
+        { "control_code": "PR.AA-03", "title": "Users/services are authenticated", "category": "Protect", "coverage_type": "partial", "description": "Encrypted access channels, VPN authentication." },
+        { "control_code": "PR.PS-01", "title": "Configuration management practices are established (hardening)", "category": "Protect", "coverage_type": "automated", "description": "Secure config baselines." },
+        { "control_code": "PR.PS-02", "title": "Software is maintained/patched", "category": "Protect", "coverage_type": "partial", "description": "Firmware & signature updates." },
+        { "control_code": "PR.DS-02", "title": "Data-in-transit is protected", "category": "Protect", "coverage_type": "automated", "description": "Strong TLS, log transit encryption." },
+        { "control_code": "PR.IR-01", "title": "Networks & environments protected from unauthorized access", "category": "Protect", "coverage_type": "partial", "description": "Segmentation, policies, blocking malicious IPs, WAN management." },
+        { "control_code": "DE.CM-01", "title": "Networks & network services are monitored", "category": "Detect", "coverage_type": "automated", "description": "Logging, centralized logging, IPS/DNS logging." },
+        { "control_code": "DE.CM-09", "title": "Computing hardware/software & configs are monitored", "category": "Detect", "coverage_type": "partial", "description": "CPU event logging, SNMP traps." },
+        { "control_code": "RS.MA-01", "title": "Incident response process is executed", "category": "Respond", "coverage_type": "manual", "guidance": "IR procedures - manual verification (supported by logging)." },
+        { "control_code": "RC.RP-01", "title": "Recovery plan is executed (resilience)", "category": "Recover", "coverage_type": "partial", "description": "HA / availability." }
+      ]
+    },
+
+    {
+      "code": "NIST_800_41",
+      "name": "NIST SP 800-41 Rev.1 — Guidelines on Firewalls and Firewall Policy",
+      "version": "Rev.1",
+      "is_technical": false,
+      "description": "Specific guidelines for firewalls & firewall policies. Highly relevant to Section 1 & 3 (policies/objects) and logging.",
+      "controls": [
+        { "control_code": "FWP-RULESET", "title": "Ruleset enforces least privilege (deny by default, no ANY)", "category": "Firewall Policy", "coverage_type": "automated", "description": "Policies do not use ANY service; deny malicious traffic." },
+        { "control_code": "FWP-LOGGING", "title": "Firewall logging is enabled and retained", "category": "Firewall Policy", "coverage_type": "automated", "description": "Logging on all policies + centralized." },
+        { "control_code": "FWP-MGMT",    "title": "Firewall management is secured", "category": "Firewall Management", "coverage_type": "automated", "description": "Encrypted mgmt, trusted hosts, no WAN mgmt, admin ports." },
+        { "control_code": "FWP-SEG",     "title": "Network segmentation is enforced", "category": "Architecture", "coverage_type": "partial", "description": "Intra-zone deny, segmentation." },
+        { "control_code": "FWP-PATCH",   "title": "Firewall firmware kept up to date", "category": "Maintenance", "coverage_type": "partial", "description": "Latest firmware & virtual patching." },
+        { "control_code": "FWP-REVIEW",  "title": "Ruleset reviewed regularly", "category": "Firewall Policy", "coverage_type": "manual", "guidance": "Periodic rule reviews (hit counts) - manual/runtime verification." }
+      ]
+    },
+
+    {
+      "code": "ISO_27001",
+      "name": "ISO/IEC 27001:2022 (Annex A Controls)",
+      "version": "2022",
+      "is_technical": false,
+      "description": "ISMS standard. Annex A controls relevant to firewalls under themes: Access Control, Network Security, Logging, Cryptography, Configuration.",
+      "controls": [
+        { "control_code": "A.5.15", "title": "Access control", "category": "Organizational", "coverage_type": "partial", "description": "Policies & enforcement of admin access controls." },
+        { "control_code": "A.8.2",  "title": "Privileged access rights", "category": "Technological", "coverage_type": "partial", "description": "Admin profile least privilege, trusted hosts." },
+        { "control_code": "A.8.5",  "title": "Secure authentication", "category": "Technological", "coverage_type": "partial", "description": "Password policies, lockouts, encrypted channels, VPN authentication." },
+        { "control_code": "A.8.9",  "title": "Configuration management", "category": "Technological", "coverage_type": "automated", "description": "Hardening & secure baseline configurations." },
+        { "control_code": "A.8.15", "title": "Logging", "category": "Technological", "coverage_type": "automated", "description": "Event logging & centralized logging." },
+        { "control_code": "A.8.16", "title": "Monitoring activities", "category": "Technological", "coverage_type": "partial", "description": "Network monitoring, SNMP traps, IPS/DNS logging." },
+        { "control_code": "A.8.20", "title": "Networks security", "category": "Technological", "coverage_type": "partial", "description": "Segmentation, policies, blocking malicious traffic, WAN management." },
+        { "control_code": "A.8.21", "title": "Security of network services", "category": "Technological", "coverage_type": "partial", "description": "Security profiles (IPS/AV/Web/DNS/App)." },
+        { "control_code": "A.8.24", "title": "Use of cryptography", "category": "Technological", "coverage_type": "automated", "description": "Strong crypto, TLS, log transit encryption, VPN TLS." },
+        { "control_code": "A.8.8",  "title": "Management of technical vulnerabilities", "category": "Technological", "coverage_type": "partial", "description": "Firmware/patching, virtual patching, signature updates." },
+        { "control_code": "A.5.29", "title": "Information security during disruption (availability)", "category": "Organizational", "coverage_type": "partial", "description": "HA & resilience." },
+        { "control_code": "A.5.24", "title": "Incident management planning", "category": "Organizational", "coverage_type": "manual", "guidance": "Incident management procedures - manual verification." }
+      ]
+    },
+
+    {
+      "code": "PCI_DSS",
+      "name": "PCI DSS v4.0.1 (Network Security Requirements)",
+      "version": "4.0.1",
+      "is_technical": false,
+      "description": "Card data security standard. Requirement 1 (network security controls) & parts of Req 2/8/10 are relevant to firewalls.",
+      "controls": [
+        { "control_code": "Req 1.2.1", "title": "NSC ruleset restricts traffic to only necessary (deny by default)", "category": "Req 1 Network Security", "coverage_type": "automated", "description": "Policies without ANY, deny default/malicious traffic." },
+        { "control_code": "Req 1.2.5", "title": "Only necessary services/ports/protocols allowed", "category": "Req 1 Network Security", "coverage_type": "partial", "description": "Specific services, app controls for non-default ports." },
+        { "control_code": "Req 1.3.1", "title": "Inbound traffic to CDE restricted", "category": "Req 1 Network Security", "coverage_type": "partial", "description": "WAN mgmt disabled, inbound traffic restricted." },
+        { "control_code": "Req 1.4.1", "title": "NSC between trusted & untrusted networks", "category": "Req 1 Network Security", "coverage_type": "partial", "description": "Segmentation, intra-zone deny." },
+        { "control_code": "Req 2.2.1", "title": "Configuration standards (hardening) applied", "category": "Req 2 Secure Config", "coverage_type": "automated", "description": "Secure baseline hardening." },
+        { "control_code": "Req 2.2.5", "title": "Insecure services/protocols disabled or justified", "category": "Req 2 Secure Config", "coverage_type": "automated", "description": "HTTP/Telnet off, SNMPv3 only, static TLS keys off." },
+        { "control_code": "Req 2.3.1", "title": "Wireless/vendor defaults changed", "category": "Req 2 Secure Config", "coverage_type": "automated", "description": "Default admins removed, default ports changed." },
+        { "control_code": "Req 8.3.6", "title": "Strong authentication (password length/complexity)", "category": "Req 8 Access", "coverage_type": "partial", "description": "Password policies, min lengths, lockouts." },
+        { "control_code": "Req 8.2.1", "title": "Unique IDs / no shared accounts", "category": "Req 8 Access", "coverage_type": "partial", "description": "Named admin accounts, remove defaults." },
+        { "control_code": "Req 10.2.1","title": "Audit logs enabled for all system components", "category": "Req 10 Logging", "coverage_type": "automated", "description": "Event logging for all policies." },
+        { "control_code": "Req 10.3.3","title": "Audit logs promptly backed up to central server", "category": "Req 10 Logging", "coverage_type": "automated", "description": "Centralized logging + transit encryption." },
+        { "control_code": "Req 6.3.3", "title": "Security patches installed", "category": "Req 6 Maintain", "coverage_type": "partial", "description": "Firmware & signature updates." },
+        { "control_code": "Req 11.5.1","title": "Intrusion detection/prevention deployed", "category": "Req 11 Test", "coverage_type": "partial", "description": "IPS profiles & botnet detection." }
+      ]
+    }
+  ]
+}

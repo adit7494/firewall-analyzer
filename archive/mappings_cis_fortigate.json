@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "description": "Seed mapping control framework -> rule CIS FortiGate. Dimuat ke tabel `control_rule_mappings`. Importer idempotent (upsert by framework_control + rule_code + rule_vendor). Mapping diturunkan dari field cis_controls (v7/v8) yang melekat di tiap rule CIS, plus relevansi teknis langsung.",
+    "generated": "2026-07-28",
+    "rule_vendor": "fortigate",
+    "strength_legend": {
+      "full": "Rule sepenuhnya mendukung/mewakili control.",
+      "partial": "Rule hanya mendukung sebagian aspek control."
+    },
+    "IMPORTANT_NOTE_FOR_AI": "rule_code merujuk ke rules.code (CIS). Jika suatu control tidak memiliki mapping di sini, artinya coverage_type-nya manual/not_covered (dinilai auditor, bukan otomatis). JANGAN membuat checker teknis baru untuk framework; status control diturunkan dari finding rule yang di-map ini."
+  },
+  "mappings": [
+
+    { "_comment": "================= CYBER TRUST MARK =================" },
+    { "framework": "CTM", "control_code": "CTM-AC", "vendor": "fortigate", "strength": "full",    "rules": ["2.2.1","2.2.2","2.4.1","2.4.2","2.4.3","2.4.4","2.4.5"] },
+    { "framework": "CTM", "control_code": "CTM-SC", "vendor": "fortigate", "strength": "full",    "rules": ["2.1.1","2.1.2","2.1.3","2.1.5","2.1.7","2.1.8","2.1.9","2.1.10","2.1.13","2.4.7","2.3.1","2.3.3"] },
+    { "framework": "CTM", "control_code": "CTM-NS", "vendor": "fortigate", "strength": "partial", "rules": ["1.1","1.2","1.3","3.2","3.3","3.4","FW-ANY"] },
+    { "framework": "CTM", "control_code": "CTM-SP", "vendor": "fortigate", "strength": "partial", "rules": ["4.1.1","4.1.2","4.2.2","4.2.3","4.2.4","4.3.1","4.3.3","4.4.1","4.5.1","4.5.4"] },
+    { "framework": "CTM", "control_code": "CTM-LOG","vendor": "fortigate", "strength": "full",    "rules": ["2.1.12","4.3.2","4.5.3","7.1.1","7.2.1","7.3.1","7.3.2"] },
+    { "framework": "CTM", "control_code": "CTM-VPN","vendor": "fortigate", "strength": "full",    "rules": ["6.1.1","6.1.2"] },
+    { "framework": "CTM", "control_code": "CTM-PATCH","vendor": "fortigate", "strength": "partial","rules": ["2.1.6","2.4.8","4.2.1"] },
+    { "framework": "CTM", "control_code": "CTM-BCP","vendor": "fortigate", "strength": "partial", "rules": ["2.5.1","2.5.2","2.5.3","2.5.4"] },
+
+    { "_comment": "================= NIST CSF 2.0 =================" },
+    { "framework": "NIST_CSF", "control_code": "ID.AM-01", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.5"] },
+    { "framework": "NIST_CSF", "control_code": "ID.RA-01", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.6","2.4.8"] },
+    { "framework": "NIST_CSF", "control_code": "PR.AA-01", "vendor": "fortigate", "strength": "full",    "rules": ["2.2.1","2.2.2","2.4.1"] },
+    { "framework": "NIST_CSF", "control_code": "PR.AA-05", "vendor": "fortigate", "strength": "partial", "rules": ["2.4.2","2.4.3","2.4.4","2.4.6","2.4.7"] },
+    { "framework": "NIST_CSF", "control_code": "PR.AA-03", "vendor": "fortigate", "strength": "partial", "rules": ["2.4.5","6.1.1"] },
+    { "framework": "NIST_CSF", "control_code": "PR.PS-01", "vendor": "fortigate", "strength": "full",    "rules": ["2.1.1","2.1.2","2.1.3","2.1.7","2.1.8","2.1.9","2.1.10","2.1.13","2.3.1","2.3.3"] },
+    { "framework": "NIST_CSF", "control_code": "PR.PS-02", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.6","4.2.1"] },
+    { "framework": "NIST_CSF", "control_code": "PR.DS-02", "vendor": "fortigate", "strength": "full",    "rules": ["2.1.9","2.1.10","6.1.2","7.3.1","7.3.2"] },
+    { "framework": "NIST_CSF", "control_code": "PR.IR-01", "vendor": "fortigate", "strength": "partial", "rules": ["1.2","1.3","3.2","3.3","3.4","FW-ANY"] },
+    { "framework": "NIST_CSF", "control_code": "DE.CM-01", "vendor": "fortigate", "strength": "full",    "rules": ["3.4","4.3.2","4.5.3","7.1.1","7.2.1"] },
+    { "framework": "NIST_CSF", "control_code": "DE.CM-09", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.12","2.3.4"] },
+    { "framework": "NIST_CSF", "control_code": "RC.RP-01", "vendor": "fortigate", "strength": "partial", "rules": ["2.5.1","2.5.2","2.5.3","2.5.4"] },
+
+    { "_comment": "================= NIST SP 800-41 =================" },
+    { "framework": "NIST_800_41", "control_code": "FWP-RULESET", "vendor": "fortigate", "strength": "full",    "rules": ["3.2","3.3","FW-ANY"] },
+    { "framework": "NIST_800_41", "control_code": "FWP-LOGGING", "vendor": "fortigate", "strength": "full",    "rules": ["3.4","7.1.1","7.2.1","7.3.1","7.3.2"] },
+    { "framework": "NIST_800_41", "control_code": "FWP-MGMT",    "vendor": "fortigate", "strength": "full",    "rules": ["1.3","2.4.2","2.4.5","2.4.7","2.1.10"] },
+    { "framework": "NIST_800_41", "control_code": "FWP-SEG",     "vendor": "fortigate", "strength": "partial", "rules": ["1.2"] },
+    { "framework": "NIST_800_41", "control_code": "FWP-PATCH",   "vendor": "fortigate", "strength": "partial", "rules": ["2.1.6","2.4.8"] },
+
+    { "_comment": "================= ISO/IEC 27001:2022 =================" },
+    { "framework": "ISO_27001", "control_code": "A.5.15", "vendor": "fortigate", "strength": "partial", "rules": ["2.4.2","2.4.4","2.4.5"] },
+    { "framework": "ISO_27001", "control_code": "A.8.2",  "vendor": "fortigate", "strength": "partial", "rules": ["2.4.1","2.4.2","2.4.3"] },
+    { "framework": "ISO_27001", "control_code": "A.8.5",  "vendor": "fortigate", "strength": "partial", "rules": ["2.2.1","2.2.2","2.4.5","6.1.1"] },
+    { "framework": "ISO_27001", "control_code": "A.8.9",  "vendor": "fortigate", "strength": "full",    "rules": ["2.1.1","2.1.2","2.1.3","2.1.5","2.1.7","2.1.8","2.1.13","2.3.1","2.3.3","2.4.7"] },
+    { "framework": "ISO_27001", "control_code": "A.8.15", "vendor": "fortigate", "strength": "full",    "rules": ["3.4","4.5.3","7.1.1","7.2.1"] },
+    { "framework": "ISO_27001", "control_code": "A.8.16", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.12","2.3.4","4.3.2"] },
+    { "framework": "ISO_27001", "control_code": "A.8.20", "vendor": "fortigate", "strength": "partial", "rules": ["1.1","1.2","1.3","3.2","3.3","FW-ANY"] },
+    { "framework": "ISO_27001", "control_code": "A.8.21", "vendor": "fortigate", "strength": "partial", "rules": ["4.1.1","4.1.2","4.2.2","4.3.1","4.3.3","4.4.1","4.5.1","4.5.4"] },
+    { "framework": "ISO_27001", "control_code": "A.8.24", "vendor": "fortigate", "strength": "full",    "rules": ["2.1.8","2.1.9","2.1.10","6.1.2","7.3.1","7.3.2"] },
+    { "framework": "ISO_27001", "control_code": "A.8.8",  "vendor": "fortigate", "strength": "partial", "rules": ["2.1.6","2.4.8","4.2.1"] },
+    { "framework": "ISO_27001", "control_code": "A.5.29", "vendor": "fortigate", "strength": "partial", "rules": ["2.5.1","2.5.2","2.5.3","2.5.4"] },
+
+    { "_comment": "================= PCI DSS v4.0.1 =================" },
+    { "framework": "PCI_DSS", "control_code": "Req 1.2.1", "vendor": "fortigate", "strength": "full",    "rules": ["3.2","3.3","3.4","FW-ANY"] },
+    { "framework": "PCI_DSS", "control_code": "Req 1.2.5", "vendor": "fortigate", "strength": "partial", "rules": ["3.2","4.5.2"] },
+    { "framework": "PCI_DSS", "control_code": "Req 1.3.1", "vendor": "fortigate", "strength": "partial", "rules": ["1.3","3.3"] },
+    { "framework": "PCI_DSS", "control_code": "Req 1.4.1", "vendor": "fortigate", "strength": "partial", "rules": ["1.2"] },
+    { "framework": "PCI_DSS", "control_code": "Req 2.2.1", "vendor": "fortigate", "strength": "full",    "rules": ["2.1.1","2.1.2","2.1.3","2.1.5","2.1.9","2.1.10","2.1.13"] },
+    { "framework": "PCI_DSS", "control_code": "Req 2.2.5", "vendor": "fortigate", "strength": "full",    "rules": ["1.3","2.1.7","2.1.8","2.3.1","2.4.5"] },
+    { "framework": "PCI_DSS", "control_code": "Req 2.3.1", "vendor": "fortigate", "strength": "full",    "rules": ["2.4.1","2.4.7"] },
+    { "framework": "PCI_DSS", "control_code": "Req 8.3.6", "vendor": "fortigate", "strength": "partial", "rules": ["2.2.1","2.2.2"] },
+    { "framework": "PCI_DSS", "control_code": "Req 8.2.1", "vendor": "fortigate", "strength": "partial", "rules": ["2.4.1","2.4.3"] },
+    { "framework": "PCI_DSS", "control_code": "Req 10.2.1","vendor": "fortigate", "strength": "full",    "rules": ["3.4","7.1.1"] },
+    { "framework": "PCI_DSS", "control_code": "Req 10.3.3","vendor": "fortigate", "strength": "full",    "rules": ["7.2.1","7.3.1","7.3.2"] },
+    { "framework": "PCI_DSS", "control_code": "Req 6.3.3", "vendor": "fortigate", "strength": "partial", "rules": ["2.1.6","4.2.1"] },
+    { "framework": "PCI_DSS", "control_code": "Req 11.5.1","vendor": "fortigate", "strength": "partial", "rules": ["4.1.1","4.1.2"] }
+
+  ]
+}

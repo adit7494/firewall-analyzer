@@ -1,0 +1,386 @@
+[
+  {
+    "code": "1.1",
+    "expected": "Trusted DNS server dikonfigurasi (bukan default 96.45.45.45 / 96.45.46.46)",
+    "rationale": "Melakukan resolusi hostname ke IP menggunakan DNS server terpercaya untuk mencegah man-in-the-middle.",
+    "default": "Primary 96.45.45.45, Secondary 96.45.46.46"
+  },
+  {
+    "code": "1.2",
+    "expected": "set intrazone deny pada zone relevan",
+    "rationale": "Menambah lapisan proteksi antar network dalam zone yang sama; hanya trafik terotorisasi yang diizinkan.",
+    "default": "Intra-zone traffic diblokir secara default"
+  },
+  {
+    "code": "1.3",
+    "expected": "allowaccess pada WAN tidak mengandung ping/https/http/ssh/snmp/radius-acct",
+    "rationale": "Management service hanya boleh di interface management; mengurangi attack surface pada WAN.",
+    "default": "Tergantung deployment"
+  },
+  {
+    "code": "2.1.1",
+    "expected": "enable",
+    "rationale": "Banner login mengurangi risiko akses tidak sah dan memperkuat posisi hukum terhadap akses ilegal.",
+    "default": "disable"
+  },
+  {
+    "code": "2.1.2",
+    "expected": "enable",
+    "rationale": "Banner pasca-login (MOTD) memberikan notifikasi hak hukum & consent monitoring.",
+    "default": "disable"
+  },
+  {
+    "code": "2.1.3",
+    "expected": "Sesuai lokasi (bukan default GMT-8 Pacific)",
+    "rationale": "Waktu akurat penting untuk validitas sertifikat & timestamp log.",
+    "default": "(GMT-8:00) Pacific Time (US & Canada)"
+  },
+  {
+    "code": "2.1.4",
+    "expected": "Trusted NTP server configured (primary & secondary); sync status = runtime",
+    "rationale": "NTP maintains accurate time for event correlation, logging, and cryptographic functions. Use SHA1 when using symmetric keys (avoid MD5).",
+    "default": "Using FortiGuard NTP"
+  },
+  {
+    "code": "2.1.5",
+    "expected": "Bukan default (bukan nomor model)",
+    "rationale": "Hostname penting untuk inventaris aset, deployment sertifikat, dan korelasi log.",
+    "default": "Nomor model unit (mis. 'FortiGate 2000E')"
+  },
+  {
+    "code": "2.1.6",
+    "expected": "Firmware stabil terbaru; tidak ada CVE terbuka (bandingkan ke PSIRT)",
+    "rationale": "Firmware terbaru mencegah eksploitasi kerentanan yang sudah diketahui.",
+    "default": "Tidak ada default (firmware pabrik saat manufaktur)"
+  },
+  {
+    "code": "2.1.7",
+    "expected": "auto-install-config disable & auto-install-image disable",
+    "rationale": "Mencegah config/firmware termanipulasi dimuat otomatis via USB.",
+    "default": "auto-install enabled"
+  },
+  {
+    "code": "2.1.8",
+    "expected": "disable",
+    "rationale": "Mencegah sesi TLS yang terminate di FortiGate menggunakan static SSL key.",
+    "default": "ssl-static-key-ciphers enabled"
+  },
+  {
+    "code": "2.1.9",
+    "expected": "enable",
+    "rationale": "Memaksa FortiOS hanya memakai enkripsi & cipher kuat.",
+    "default": "strong-crypto enabled by default"
+  },
+  {
+    "code": "2.1.10",
+    "expected": "tlsv1-3 (minimal tlsv1-2)",
+    "rationale": "Gunakan TLS versi tinggi untuk mencegah serangan MiTM pada akses GUI.",
+    "default": "FortiOS 7.x: TLS 1.2 & 1.3"
+  },
+  {
+    "code": "2.1.11",
+    "expected": "enable",
+    "rationale": "Memuat artefak GUI statis via CDN untuk performa; BUKAN kontrol keamanan (informational).",
+    "default": "Enabled"
+  },
+  {
+    "code": "2.1.12",
+    "expected": "enable",
+    "rationale": "Mendeteksi single CPU core overload yang bisa terlewat pada perangkat multi-core.",
+    "default": "Disabled"
+  },
+  {
+    "code": "2.1.13",
+    "expected": "disable",
+    "rationale": "Hostname pada halaman login dapat menjadi informasi untuk reconnaissance.",
+    "default": "disable"
+  },
+  {
+    "code": "2.2.1",
+    "expected": "status enable, minimum-length >= 14, apply-to admin-password ipsec-preshared-key (scope both)",
+    "rationale": "Password kompleks/panjang mencegah brute force. CIS: minimal 14 karakter.",
+    "default": "Password Policy disabled (scope Off)"
+  },
+  {
+    "code": "2.2.2",
+    "expected": "admin-lockout-threshold <= 3 dan admin-lockout-duration <= 900",
+    "rationale": "Membatasi percobaan login gagal untuk meminimalkan brute force.",
+    "default": "threshold 3, duration 60 detik"
+  },
+  {
+    "code": "2.3.1",
+    "expected": "Tidak ada community SNMPv1/v2c; hanya user SNMPv3 (auth-priv, sha256/aes256)",
+    "rationale": "SNMPv3 menambah autentikasi & privasi; v1/v2c mengirim data clear text.",
+    "default": "SNMP agent disabled"
+  },
+  {
+    "code": "2.3.2",
+    "expected": "notify-hosts berisi IP spesifik; tidak ada 0.0.0.0",
+    "rationale": "Membatasi informasi SNMP hanya ke device relevan (NMS).",
+    "default": "Tidak ada SNMP dikonfigurasi"
+  },
+  {
+    "code": "2.3.3",
+    "expected": "disable (untuk user yang hanya menerima trap)",
+    "rationale": "SNMP query dapat dipakai reconnaissance; matikan pada user trap-only.",
+    "default": "SNMPv3 user mengizinkan Queries"
+  },
+  {
+    "code": "2.3.4",
+    "expected": "Threshold dikonfigurasi (mis. trap-free-memory 20, trap-freeable-memory 50)",
+    "rationale": "Memory kritis memicu conserve mode yang mengganggu inspeksi keamanan; trap memberi peringatan dini.",
+    "default": "trap-free-memory 5, trap-freeable-memory 60"
+  },
+  {
+    "code": "2.4.1",
+    "expected": "Tidak ada user bernama 'admin'; kredensial default tidak berlaku",
+    "rationale": "Kredensial default terdokumentasi vendor sehingga jadi target pertama serangan.",
+    "default": "Username admin tanpa password"
+  },
+  {
+    "code": "2.4.2",
+    "expected": "Setiap akun admin punya trusted host spesifik (bukan 0.0.0.0/0)",
+    "rationale": "Akses admin hanya dari segmen jaringan tepercaya; lapisan keamanan tambahan.",
+    "default": "Setiap akun dapat diakses dari mana saja (0.0.0.0/0)"
+  },
+  {
+    "code": "2.4.3",
+    "expected": "Least privilege: setiap akun memakai accprofile sesuai perannya",
+    "rationale": "Level admin berbeda (tier 1/2/3) butuh privilege minimum yang sesuai.",
+    "default": "Hanya prof_admin & super_admin"
+  },
+  {
+    "code": "2.4.4",
+    "expected": "<= 15 menit (ideal 5). >15 berdampak negatif ke security rating.",
+    "rationale": "Mencegah akses tidak sah pada sesi GUI yang ditinggalkan.",
+    "default": "5 menit"
+  },
+  {
+    "code": "2.4.5",
+    "expected": "allowaccess tidak berisi http & telnet (hanya ssh/https)",
+    "rationale": "Hanya akses terenkripsi untuk mencegah sniffing kredensial (MiTM).",
+    "default": "HTTP & Telnet tidak aktif di interface manapun"
+  },
+  {
+    "code": "2.4.6",
+    "expected": "Terdapat local-in-policy untuk kontrol trafik ke interface FortiGate",
+    "rationale": "Local-in policy memberi kontrol granular trafik menuju interface FortiGate, melampaui trusted host.",
+    "default": "Tidak ada local-in-policy secara default"
+  },
+  {
+    "code": "2.4.7",
+    "expected": "admin-port & admin-sport bukan 80/443; admin-https-redirect disable",
+    "rationale": "Mengubah port admin default mengurangi attack surface & konflik port.",
+    "default": "admin-port 80, admin-sport 443, https-redirect enable"
+  },
+  {
+    "code": "2.4.8",
+    "expected": "virtual-patch enable pada policy yang mengizinkan trafik (butuh lisensi FMWP)",
+    "rationale": "IPS signature (FMWP) memberi virtual patching pada akses GUI/SSH sebelum patch resmi diterapkan.",
+    "default": "Disabled"
+  },
+  {
+    "code": "2.5.1",
+    "expected": "mode a-a atau a-p; group-name, password, hbdev dikonfigurasi",
+    "rationale": "HA meningkatkan ketersediaan & mengurangi dampak maintenance/kegagalan perangkat.",
+    "default": "N/A"
+  },
+  {
+    "code": "2.5.2",
+    "expected": "Interface kritis dimasukkan ke 'set monitor'",
+    "rationale": "Interface monitoring memungkinkan failover saat media fisik/port bermasalah.",
+    "default": "N/A"
+  },
+  {
+    "code": "2.5.3",
+    "expected": "ha-mgmt-status enable + minimal 1 interface & gateway",
+    "rationale": "Agar primary & secondary bisa diakses langsung tanpa share virtual MAC.",
+    "default": "N/A"
+  },
+  {
+    "code": "2.5.4",
+    "expected": "group-id bukan default 0 (0-1023)",
+    "rationale": "Group-ID membangkitkan virtual MAC; non-default mencegah duplikasi MAC di L2.",
+    "default": "group-id 0"
+  },
+  {
+    "code": "3.1",
+    "expected": "Policy tanpa hit ditinjau; disable/log yang tidak terpakai (review 2x/tahun)",
+    "rationale": "Menjaga rule base tetap ramping & mencegah trafik ter-allow/block tak sengaja.",
+    "default": "Hit count 0 di awal"
+  },
+  {
+    "code": "3.2",
+    "expected": "Tidak ada policy dengan service 'ALL'",
+    "rationale": "Mencegah firewall mengizinkan protokol/service tidak terotorisasi secara tak sengaja.",
+    "default": "Policy baru default service 'ALL'"
+  },
+  {
+    "code": "3.3",
+    "expected": "Ada policy deny inbound & outbound untuk ISDB (Tor, Botnet-C&C, Phishing, Proxy, Spam, Anonymous VPN, Malicious, Scanner)",
+    "rationale": "Filter trafik berbahaya sebagai lapisan pertama tanpa proses berat seperti IPS.",
+    "default": "Tidak ada"
+  },
+  {
+    "code": "3.4",
+    "expected": "Allow policy: log all sessions; Deny policy: log violation traffic (termasuk implicit deny)",
+    "rationale": "Logging pada semua policy memungkinkan investigasi SOC/IR & threat hunting.",
+    "default": "Logging disabled"
+  },
+  {
+    "code": "FW-ANY",
+    "expected": "Tidak ada policy dengan src=all, dst=all, service=ALL",
+    "rationale": "Policy any-any-any membuka permukaan serangan sangat luas; melengkapi 3.2 & 3.4.",
+    "default": "-"
+  },
+  {
+    "code": "4.1.1",
+    "expected": "Block outgoing botnet, diterapkan pada policy dengan tujuan WAN",
+    "rationale": "Blokir koneksi keluar ke botnet sebagai bagian defense-in-depth.",
+    "default": "Disabled pada default profile"
+  },
+  {
+    "code": "4.1.2",
+    "expected": "IPS profile diterapkan pada policy antar-interface (allowed)",
+    "rationale": "Trafik antar interface harus diinspeksi IPS.",
+    "default": "Not Configured"
+  },
+  {
+    "code": "4.2.1",
+    "expected": "Scheduled updates = Automatic",
+    "rationale": "Memastikan signature database AV selalu terbaru dari FortiGuard.",
+    "default": "Enabled & automatic"
+  },
+  {
+    "code": "4.2.2",
+    "expected": "AV profile diterapkan pada policy relevan",
+    "rationale": "Trafik antar interface harus diinspeksi antivirus.",
+    "default": "Tidak ada inspeksi pada policy"
+  },
+  {
+    "code": "4.2.3",
+    "expected": "outbreak-prevention block untuk tiap protokol",
+    "rationale": "Menambah lapisan hash signature FortiGuard di atas AV signature-based.",
+    "default": "Disabled"
+  },
+  {
+    "code": "4.2.4",
+    "expected": "enable",
+    "rationale": "Model AI mendeteksi PE Windows berpotensi malicious untuk mitigasi zero-day.",
+    "default": "Enabled"
+  },
+  {
+    "code": "4.2.5",
+    "expected": "enable",
+    "rationale": "Grayware dapat dipakai untuk tujuan malicious; signature di-update seperti AV.",
+    "default": "Enabled di 7.4+ (versi lama: disabled)"
+  },
+  {
+    "code": "4.2.6",
+    "expected": "sandbox-inline-scan enable + AV profile fortisandbox-mode inline & fortisandbox block",
+    "rationale": "Cloud sandbox (FAIS) mendeteksi malware unknown & mencegah patient zero (butuh lisensi FAIS).",
+    "default": "Disabled"
+  },
+  {
+    "code": "4.2.7",
+    "expected": "CDR aktif untuk office files (XLSB, OpenOffice, RTF) pada AV profile proxy-mode",
+    "rationale": "CDR mensanitasi konten berbahaya di dokumen sebelum sampai ke user.",
+    "default": "Disabled"
+  },
+  {
+    "code": "4.3.1",
+    "expected": "'Redirect botnet C&C requests to Block Portal' enable + diterapkan pada policy DNS",
+    "rationale": "Blokir botnet pada tahap resolusi DNS sebagai lapisan pertahanan tambahan.",
+    "default": "Enabled pada default profile"
+  },
+  {
+    "code": "4.3.2",
+    "expected": "log-all-domain enable",
+    "rationale": "Log semua DNS query/response untuk investigasi SOC/IR.",
+    "default": "Disabled"
+  },
+  {
+    "code": "4.3.3",
+    "expected": "DNS Filter profile diterapkan pada policy outbound ke Internet",
+    "rationale": "Trafik keluar ke Internet harus diinspeksi DNS Filter.",
+    "default": "Not Configured"
+  },
+  {
+    "code": "4.4.1",
+    "expected": "Kategori Security Risk (Malicious Websites, Phishing, Spam URLs) = Block",
+    "rationale": "Kategori Security Risk sering jadi vektor serangan (malware, phishing, C2).",
+    "default": "Semua kategori Security Risk & Unrated default Block"
+  },
+  {
+    "code": "4.5.1",
+    "expected": "Kategori P2P & Proxy = Block",
+    "rationale": "Aplikasi P2P/Proxy dikenal menyebarkan malware & dapat bypass inspeksi.",
+    "default": "Semua kategori default 'Monitor'"
+  },
+  {
+    "code": "4.5.2",
+    "expected": "enable",
+    "rationale": "Aplikasi di port non-default bisa indikasi data exfiltration (mis. HTTPS di 10443).",
+    "default": "Disabled"
+  },
+  {
+    "code": "4.5.3",
+    "expected": "Tidak ada kategori ber-action 'Allow' (gunakan Monitor/Block), termasuk Unknown Applications",
+    "rationale": "Action 'Allow' tidak dilog sehingga menciptakan visibility gap.",
+    "default": "Kategori 'Unknown Applications' = Allow"
+  },
+  {
+    "code": "4.5.4",
+    "expected": "App Control profile diterapkan pada policy antar-interface (allowed)",
+    "rationale": "Trafik antar interface harus diinspeksi Application Control.",
+    "default": "Not Configured"
+  },
+  {
+    "code": "5.1.1",
+    "expected": "Automation stitch 'Compromised Host Quarantine' status enable (jika pakai Fabric ecosystem)",
+    "rationale": "Karantina otomatis host high-severity pada FortiAP/FortiSwitch/FortiClient EMS.",
+    "default": "Not enabled"
+  },
+  {
+    "code": "5.2.1.1",
+    "expected": "Root FortiGate status enable, role 'Serve as Fabric Root' (jika fitur Fabric dipakai)",
+    "rationale": "Tanpa root FortiGate, Security Fabric tidak berfungsi.",
+    "default": "Disabled"
+  },
+  {
+    "code": "6.1.1",
+    "expected": "Server Certificate = sertifikat dari CA terpercaya (bukan self-signed/factory)",
+    "rationale": "Sertifikat self-signed rentan MiTM & koneksi ke server tak terpercaya.",
+    "default": "Self-signed factory certificate"
+  },
+  {
+    "code": "6.1.2",
+    "expected": "ssl-max-proto-ver tls1-3, ssl-min-proto-ver tls1-2, algorithm high",
+    "rationale": "Membatasi TLS ke versi aman & cipher kuat meningkatkan keamanan koneksi SSL VPN.",
+    "default": "ssl-max-proto-ver: tls1-3, ssl-min-proto-ver: tls1-2, algorithm: high"
+  },
+  {
+    "code": "7.1.1",
+    "expected": "event enable (semua tipe event)",
+    "rationale": "Event logging menghasilkan log untuk review/audit & ingest ke SIEM/Analyzer.",
+    "default": "Enabled"
+  },
+  {
+    "code": "7.2.1",
+    "expected": "Log dikirim ke perangkat terpusat (SIEM/Syslog/FortiAnalyzer/FortiManager)",
+    "rationale": "Logging terpusat memberi retensi lebih andal & data lebih kaya untuk review.",
+    "default": "Not configured"
+  },
+  {
+    "code": "7.3.1",
+    "expected": "reliable enable & enc-algorithm high",
+    "rationale": "Enkripsi log ke FAZ/FMG mencegah log disadap saat transit.",
+    "default": "Disabled"
+  },
+  {
+    "code": "7.3.2",
+    "expected": "reliable enable & enc-algorithm high",
+    "rationale": "Enkripsi log ke syslog mencegah log disadap saat transit.",
+    "default": "Disabled"
+  }
+]
