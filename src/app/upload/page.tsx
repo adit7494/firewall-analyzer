@@ -231,8 +231,8 @@ end`;
         vendor: vendorToUse
       });
 
-      // 3. Navigate directly to telemetry/progress page for the created audit
-      router.push(`/audit/progress?auditId=${startData.auditId}`);
+      // 3. Navigate immediately to Audit Results directory so user can monitor progress and continue other tasks
+      router.push('/audit/results');
     } catch (err) {
       console.error(err);
       alert('An error occurred while preparing the audit: ' + (err as Error).message);

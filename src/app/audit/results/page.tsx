@@ -165,6 +165,7 @@ function AuditResultsContent() {
                 const openCount = findings.filter(f => f.status === 'open').length;
                 const critCount = findings.filter(f => f.status === 'open' && f.severity === 'Critical').length;
                 const isInProgress = audit.status === 'in_progress' || (audit.status as string) === 'parsing';
+                const activeScan = activeScans.find(s => s.auditId === audit.id);
                 
                 return (
                   <tr key={audit.id} style={{ borderBottom: idx === filtered.length - 1 ? 'none' : '1px solid var(--line)', transition: 'background 0.15s ease' }} className="table-row-hover">
@@ -198,9 +199,24 @@ function AuditResultsContent() {
 
                     <td style={{ padding: '12px 14px' }}>
                       {isInProgress ? (
-                        <span style={{ fontSize: 12, color: 'var(--cyan-d)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
-                          <Activity size={13} className="animate-pulse" /> Evaluating...
-                        </span>
+                        activeScan && activeScan.progress ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div className="bar-track" style={{ width: 60, height: 8, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}>
+                              <div className="bar-fill" style={{ 
+                                width: `${activeScan.progress}%`, 
+                                background: 'linear-gradient(90deg, var(--cyan), var(--indigo))',
+                                borderRadius: 4,
+                                height: '100%',
+                                transition: 'width 0.4s ease'
+                              }} />
+                            </div>
+                            <b style={{ fontSize: 13, fontWeight: 800, color: 'var(--cyan-d)', minWidth: 28 }}>{activeScan.progress}%</b>
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: 12, color: 'var(--cyan-d)', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+                            <Activity size={13} className="animate-pulse" /> Evaluating...
+                          </span>
+                        )
                       ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div className="bar-track" style={{ width: 60, height: 8, borderRadius: 4, background: 'rgba(0,0,0,0.06)' }}>
@@ -230,9 +246,16 @@ function AuditResultsContent() {
 
                     <td style={{ padding: '12px 14px' }}>
                       {isInProgress ? (
-                        <span className="pill pill-info animate-pulse" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 9px', fontSize: 11 }}>
-                          <Bot size={13} className="animate-spin text-cyan-600" /> AI Analyzing
-                        </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          <span className="pill pill-info animate-pulse" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '3px 9px', fontSize: 11, width: 'fit-content' }}>
+                            <Bot size={13} className="animate-spin text-cyan-600" /> AI Analyzing {activeScan ? `(${activeScan.progress}%)` : ''}
+                          </span>
+                          {activeScan?.currentBlock && (
+                            <span style={{ fontSize: 10, color: 'var(--muted)', whiteSpace: 'nowrap', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {activeScan.currentBlock}
+                            </span>
+                          )}
+                        </div>
                       ) : (
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
                           {critCount > 0 && (
