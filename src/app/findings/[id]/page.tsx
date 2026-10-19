@@ -81,12 +81,18 @@ function FindingDetailContent({ findingId }: { findingId: string }) {
         }
 
         if (targetFinding) {
-          const normId = normalizeRuleId(targetFinding.rule_id || targetFinding.cis_code || '');
+          let lookupId = targetFinding.rule_id || targetFinding.cis_code || '';
+          if ((lookupId === 'CIS-3.4' || lookupId === '3.4') && (targetFinding.title.toLowerCase().includes('snmp') || targetFinding.category === 'SNMP')) {
+            lookupId = 'CIS-2.3.4';
+          }
+          const normId = normalizeRuleId(lookupId);
           const details = RULES_CATALOG.find(r => normalizeRuleId(r.id) === normId || normalizeRuleId(r.code) === normId);
           let enrichedFinding: Finding = { ...(details as Partial<Finding>), ...targetFinding };
           
           if (details) {
-            // Ensure catalog's remediation and audit guidance are populated if finding lacks them
+            // Ensure catalog's remediation, audit guidance, and impact are populated if finding lacks them
+            enrichedFinding.rationale = targetFinding.rationale || details.rationale;
+            enrichedFinding.impact = targetFinding.impact || details.impact;
             enrichedFinding.remediation = targetFinding.remediation || details.remediation;
             enrichedFinding.remediation_procedure = targetFinding.remediation_procedure || details.remediation_procedure;
             enrichedFinding.audit_procedure = targetFinding.audit_procedure || details.audit_procedure;

@@ -157,8 +157,8 @@ function promptSystemSnmpSysinfo(block: string): string {
   return `Analyze the FortiGate "config system snmp sysinfo" block below.
 
 RULES TO CHECK:
-- CIS-3.4 [L1, Medium, SNMP]: SNMP traps should be configured for critical events (trap-free-memory, trap-freeable-memory, etc.).
-- CIS-3.1 [L1, High, SNMP]: If SNMP is enabled, the system contact and location fields should be configured (not empty) to identify the device owner and physical location.
+- CIS-2.3.4 [L1, Medium, SNMP]: SNMP traps should be configured for critical events (trap-free-memory, trap-freeable-memory, etc.).
+- CIS-2.3.1 [L1, High, SNMP]: If SNMP is enabled, the system contact and location fields should be configured (not empty) to identify the device owner and physical location.
 
 CONFIGURATION BLOCK:
 ${block}
@@ -170,8 +170,8 @@ function promptSystemSnmpCommunity(block: string): string {
   return `Analyze the FortiGate "config system snmp community" block below, which lists all SNMP v1/v2c communities.
 
 RULES TO CHECK:
-- CIS-3.2 [L1, Critical, SNMP]: SNMP v1/v2c communities must NOT be configured. Any community entry present here means SNMPv1/v2c is in use, which transmits credentials in plaintext. All community entries are a critical finding.
-- CIS-3.1 [L1, Critical, SNMP]: The default community string "public" or "private" must never be used. If a community with name "public" or "private" exists, this is a critical finding regardless of other settings.
+- CIS-2.3.1 [L1, Critical, SNMP]: SNMP v1/v2c communities must NOT be configured. Any community entry present here means SNMPv1/v2c is in use, which transmits credentials in plaintext. All community entries are a critical finding.
+- CIS-2.3.1 [L1, Critical, SNMP]: The default community string "public" or "private" must never be used. If a community with name "public" or "private" exists, this is a critical finding regardless of other settings.
 
 CONFIGURATION BLOCK (ALL SNMP communities — empty means SNMPv1/v2c not configured):
 ${block}

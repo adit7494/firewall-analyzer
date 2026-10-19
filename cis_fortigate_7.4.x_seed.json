@@ -18,7 +18,7 @@
       "expected_value": "Trusted DNS server configured (instead of default 96.45.45.45 / 96.45.46.46)",
       "rationale": "Perform hostname to IP resolution using a trusted DNS server to prevent man-in-the-middle.",
       "audit_procedure": "CLI:\nconfig system dns\nshows\n\nGUI: Network > DNS. Make sure to use a trusted DNS (default FortiGuard or custom).",
-      "remediation_procedure": "CLI:\nconfig system dns\n  set primary 8.8.8.8\n  set secondary 8.8.4.4\nend\n\nGUI: Network > DNS > Specify, isi Primary & Secondary DNS.",
+      "remediation_procedure": "CLI:\nconfig system dns\n  set primary 8.8.8.8\n  set secondary 8.8.4.4\nend\n\nGUI: Network > DNS > Specify, enter Primary & Secondary DNS.",
       "default_value": "Primary 96.45.45.45, Secondary 96.45.46.46",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/903162"
@@ -40,7 +40,7 @@
       "expected_value": "set intrazone deny on the relevant zone",
       "rationale": "Adding layers of protection between networks in the same zone; only authorized traffic is permitted.",
       "audit_procedure": "CLI:\nconfig system zone\n  edit <ZONE>\n  show full (check: set intrazone deny)\n\nGUI: Network > Interfaces > select zone > Edit > ensure 'Block intra-zone traffic' is active.",
-      "remediation_procedure": "CLI:\nconfig system zone\n  edit <ZONE>\n  set intrazone deny\nend\n\nGUI: aktifkan 'Block intra-zone traffic' pada zone.",
+      "remediation_procedure": "CLI:\nconfig system zone\n  edit <ZONE>\n  set intrazone deny\nend\n\nGUI: Enable 'Block intra-zone traffic' on the zone.",
       "default_value": "Intra-zone traffic is blocked by default",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/cli-reference/314783845/config-system-zone",
@@ -63,7 +63,7 @@
       "expected_value": "allowaccess on WAN does not contain ping/https/http/ssh/snmp/radius-acct",
       "rationale": "Management service can only be in the management interface; reduce the attack surface on the WAN.",
       "audit_procedure": "CLI:\nshow system interface\nIdentify the WAN interface, make sure 'set allowaccess' does not contain ping, https, http, ssh, snmp, radius-acct.\n\nGUI: Network > Interfaces > WAN > check Administrative Access.",
-      "remediation_procedure": "CLI:\nconfig system interface\n  edit \"port1\"\n  unselect allowaccess ping https ssh snmp http radius-acct\nend\n\nGUI: nonaktifkan HTTPS/HTTP/ping/SSH/SNMP/Radius pada interface WAN. Untuk IPsec/SSLVPN gunakan local-in-policy (lihat 2.4).",
+      "remediation_procedure": "CLI:\nconfig system interface\n  edit \"port1\"\n  unselect allowaccess ping https ssh snmp http radius-acct\nend\n\nGUI: Disable HTTPS/HTTP/ping/SSH/SNMP/Radius on WAN interfaces. For IPsec/SSLVPN, use local-in-policy (see 2.4).",
       "default_value": "Depends on deployment",
       "references": [],
       "cis_controls": [
@@ -82,8 +82,8 @@
       "config_key": "config system global > pre-login-banner",
       "expected_value": "enable",
       "rationale": "Login banners reduce the risk of unauthorized access and strengthen the legal position against illegal access.",
-      "audit_procedure": "CLI:\nget system global   (cek: pre-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Pre-login Disclaimer Message'.",
-      "remediation_procedure": "CLI:\nconfig system global\n  set pre-login-banner enable\nend\n\nGUI: edit isi 'Pre-login Disclaimer Message' lalu Save.",
+      "audit_procedure": "CLI:\nget system global   (verify: pre-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Pre-login Disclaimer Message'.",
+      "remediation_procedure": "CLI:\nconfig system global\n  set pre-login-banner enable\nend\n\nGUI: Edit content of 'Pre-login Disclaimer Message' and Save.",
       "default_value": "disable",
       "references": [
         "https://community.fortinet.com/t5/FortiGate/Technical-Tip-Configuring-admin-disclaimer-page/ta-p/198609"
@@ -105,7 +105,7 @@
       "expected_value": "enable",
       "rationale": "Post-login banner (MOTD) provides notification of legal rights & consent monitoring.",
       "impact": "Script otomatis mungkin terpengaruh karena CLI/GUI butuh aksi 'Accept'.",
-      "audit_procedure": "CLI:\nget system global   (cek: post-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Post-login Disclaimer Message'.",
+      "audit_procedure": "CLI:\nget system global   (verify: post-login-banner : enable)\n\nGUI: System > Replacement Messages > Extended View > 'Post-login Disclaimer Message'.",
       "remediation_procedure": "CLI:\nconfig system global\n  set post-login-banner enable\nend",
       "default_value": "disable",
       "references": [
@@ -127,7 +127,7 @@
       "config_key": "config system global > timezone",
       "expected_value": "According to location (not the default GMT-8 Pacific)",
       "rationale": "Accurate time is important for the validity of certificates & timestamp logs.",
-      "audit_procedure": "CLI:\nget system global   (cek field: timezone)\n\nGUI: System > Settings > System Time.",
+      "audit_procedure": "CLI:\nget system global   (verify field: timezone)\n\nGUI: System > Settings > System Time.",
       "remediation_procedure": "CLI:\nglobal system config\n  set timezone <id> (type 'set timezone ?' for a list of IDs)\nend",
       "default_value": "(GMT-8:00) Pacific Time (US & Canada)",
       "references": [
@@ -149,7 +149,7 @@
       "config_key": "config system ntp",
       "expected_value": "Trusted NTP server configured (primary & secondary); sync status = runtime",
       "rationale": "NTP maintains accurate time for event correlation, logging, and cryptographic functions. Use SHA1 when using symmetric keys (avoid MD5).",
-      "audit_procedure": "CLI:\ndiag sys ntp status   (cek: synchronized: yes)",
+      "audit_procedure": "CLI:\ndiag sys ntp status   (verify: synchronized: yes)",
       "remediation_procedure": "CLI:\nconfig system ntp\n  set type custom\n  config ntpserver\n    edit 1\n      set server pool.ntp.org\n    next\n    edit 2\n      set server 1.1.1.1\n  end\nend",
       "default_value": "Using FortiGuard NTP",
       "references": [
@@ -171,7 +171,7 @@
       "config_key": "config system global > hostname",
       "expected_value": "Not default (not model number)",
       "rationale": "Hostnames are important for asset inventory, certificate deployment, and log correlation.",
-      "audit_procedure": "CLI:\nget system global   (cek field: hostname)\n\nGUI: System > Settings > Hostname.",
+      "audit_procedure": "CLI:\nget system global   (verify field: hostname)\n\nGUI: System > Settings > Hostname.",
       "remediation_procedure": "CLI:\nconfig system global\n  set hostname \"New_FGT1\"\nend",
       "default_value": "Unit model number (e.g. 'FortiGate 2000E')",
       "references": [
@@ -217,7 +217,7 @@
       "config_key": "config system auto-install > auto-install-config / auto-install-image",
       "expected_value": "auto-install-config disable & auto-install-image disable",
       "rationale": "Prevents manipulated config/firmware from being automatically loaded via USB.",
-      "audit_procedure": "CLI:\nconfig system auto-install\nget   (cek auto-install-config & auto-install-image disabled)",
+      "audit_procedure": "CLI:\nconfig system auto-install\nget   (verify auto-install-config & auto-install-image disabled)",
       "remediation_procedure": "CLI:\nconfig system auto-install\n  set auto-install-config disable\n  set auto-install-image disable\nend",
       "default_value": "auto-install enabled",
       "references": [
@@ -239,7 +239,7 @@
       "config_key": "config system global > ssl-static-key-ciphers",
       "expected_value": "disable",
       "rationale": "Prevent terminated TLS sessions on FortiGate using static SSL keys.",
-      "audit_procedure": "CLI:\nconfig system global\nget   (cek ssl-static-key-ciphers disabled)",
+      "audit_procedure": "CLI:\nconfig system global\nget   (verify ssl-static-key-ciphers disabled)",
       "remediation_procedure": "CLI:\nconfig system global\n  set ssl-static-key-ciphers disable\nend",
       "default_value": "ssl-static-key-ciphers enabled",
       "references": [
@@ -261,7 +261,7 @@
       "config_key": "config system global > strong-crypto",
       "expected_value": "enable",
       "rationale": "Forcing FortiOS to only use strong encryption & ciphers.",
-      "audit_procedure": "CLI:\nconfig system global\nget   (cek strong-crypto enabled)",
+      "audit_procedure": "CLI:\nconfig system global\nget   (verify strong-crypto enabled)",
       "remediation_procedure": "CLI:\nconfig system global\n  set strong-crypto enable\nend",
       "default_value": "strong-crypto enabled by default",
       "references": [
@@ -283,7 +283,7 @@
       "config_key": "config system global > admin-https-ssl-versions",
       "expected_value": "tlsv1-3 (minimal tlsv1-2)",
       "rationale": "Use high version of TLS to prevent MiTM attacks on GUI access.",
-      "audit_procedure": "CLI:\nconfig system global\nget   (cek admin-https-ssl-versions tlsv1-3)",
+      "audit_procedure": "CLI:\nconfig system global\nget   (verify admin-https-ssl-versions tlsv1-3)",
       "remediation_procedure": "CLI:\nconfig system global\n  set admin-https-ssl-versions tlsv1-3\nend",
       "default_value": "FortiOS 7.x: TLS 1.2 & 1.3",
       "references": [
@@ -305,8 +305,8 @@
       "config_key": "config system global > gui-cdn-usage",
       "expected_value": "enable",
       "rationale": "Loading static GUI artifacts via CDN for performance; NOT a security control (informational).",
-      "impact": "Tidak ada dampak keamanan jika tidak diaktifkan.",
-      "audit_procedure": "CLI:\nconfig system global\nget   (cek gui-cdn-usage enabled)",
+      "impact": "No direct security vulnerability if not enabled.",
+      "audit_procedure": "CLI:\nconfig system global\nget   (verify gui-cdn-usage enabled)",
       "remediation_procedure": "CLI:\nconfig system global\n  set gui-cdn-usage enable\nend",
       "default_value": "Enabled",
       "references": [
@@ -325,7 +325,7 @@
       "config_key": "config system global > log-single-cpu-high",
       "expected_value": "enable",
       "rationale": "Detects single CPU core overload that can be missed on multi-core devices.",
-      "audit_procedure": "CLI:\nconfig system global\nget   (cek log-single-cpu-high enabled)",
+      "audit_procedure": "CLI:\nconfig system global\nget   (verify log-single-cpu-high enabled)",
       "remediation_procedure": "CLI:\nconfig system global\n  set log-single-cpu-high enable\nend",
       "default_value": "Disabled",
       "references": [
@@ -347,7 +347,7 @@
       "config_key": "config system global > gui-display-hostname",
       "expected_value": "disable",
       "rationale": "The hostname on the login page can be information for reconnaissance.",
-      "audit_procedure": "CLI:\nget system global | grep -f gui-display   (cek gui-display-hostname: disable)",
+      "audit_procedure": "CLI:\nget system global | grep -f gui-display   (verify gui-display-hostname: disable)",
       "remediation_procedure": "CLI:\nconfig system global\n  set gui-display-hostname disable\nend",
       "default_value": "disable",
       "references": [],
@@ -387,7 +387,7 @@
       "config_key": "config system global > admin-lockout-threshold / admin-lockout-duration",
       "expected_value": "admin-lockout-threshold <= 3 dan admin-lockout-duration <= 900",
       "rationale": "Limit failed login attempts to minimize brute force.",
-      "audit_procedure": "CLI:\nget system global   (cek admin-lockout-threshold & admin-lockout-duration)",
+      "audit_procedure": "CLI:\nget system global   (verify admin-lockout-threshold & admin-lockout-duration)",
       "remediation_procedure": "CLI:\nconfig system global\n  set admin-lockout-threshold 3\n  set admin-lockout-duration 900\nend",
       "default_value": "threshold 3, duration 60 detik",
       "references": [
@@ -409,9 +409,9 @@
       "config_key": "config system snmp community / config system snmp user",
       "expected_value": "There is no community SNMPv1/v2c; SNMPv3 users only (auth-priv, sha256/aes256)",
       "rationale": "SNMPv3 adds authentication & privacy; v1/v2c sends clear text data.",
-      "impact": "SNMP server lama (v1/v2c) tidak bisa query.",
+      "impact": "Legacy SNMP management servers (v1/v2c) will be unable to query.",
       "audit_procedure": "CLI:\nconfig system snmp sysinfo (show; status enable)\nconfig system snmp community (show; harus kosong)\nconfig system snmp user (show; ada user v3)\n\nGUI: System > SNMP.",
-      "remediation_procedure": "CLI: aktifkan agent (config system snmp sysinfo > set status enable), hapus community v1/v2c (delete <id>), tambah user v3 (security-level auth-priv, auth-proto sha256, priv-proto aes256).",
+      "remediation_procedure": "CLI: Enable agent (config system snmp sysinfo > set status enable), remove v1/v2c community (delete <id>), add v3 user (security-level auth-priv, auth-proto sha256, priv-proto aes256).",
       "default_value": "SNMP agent disabled",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/325005/basic-configuration"
@@ -432,7 +432,7 @@
       "config_key": "config system snmp user > notify-hosts",
       "expected_value": "notify-hosts contains specific IPs; no 0.0.0.0",
       "rationale": "Restricts SNMP information to only relevant devices (NMS).",
-      "audit_procedure": "CLI:\nshow system snmp user   (cek notify-hosts = IP spesifik, tanpa 0.0.0.0)\n\nGUI: System > SNMP > SNMPv3 > Hosts.",
+      "audit_procedure": "CLI:\nshow system snmp user   (verify notify-hosts = specific IP, without 0.0.0.0)\n\nGUI: System > SNMP > SNMPv3 > Hosts.",
       "remediation_procedure": "CLI:\nconfig system snmp user\n  edit <user>\n  unselect notify-hosts 0.0.0.0\nend",
       "default_value": "No SNMP configured",
       "references": [
@@ -455,7 +455,7 @@
       "config_key": "config system snmp user > queries",
       "expected_value": "disable (for users who only accept traps)",
       "rationale": "SNMP queries can be used for reconnaissance; turn it off on user trap-only.",
-      "audit_procedure": "CLI:\nconfig system snmp user (cek: set queries disable)\n\nGUI: System > SNMP > user > slider Queries.",
+      "audit_procedure": "CLI:\nconfig system snmp user (verify: set queries disable)\n\nGUI: System > SNMP > user > slider Queries.",
       "remediation_procedure": "CLI:\nconfig system snmp user\n  edit <user>\n  set queries disable\nnext\nend",
       "default_value": "SNMPv3 user allows Queries",
       "references": [],
@@ -470,9 +470,9 @@
       "system_check": "auto",
       "severity": "Low",
       "config_key": "config system snmp sysinfo > trap-free-memory-threshold / trap-freeable-memory-threshold",
-      "expected_value": "Threshold dikonfigurasi (mis. trap-free-memory 20, trap-freeable-memory 50)",
+      "expected_value": "Thresholds configured (e.g., trap-free-memory 20, trap-freeable-memory 50)",
       "rationale": "Critical memory triggers conserve mode which interferes with security inspections; trap provides early warning.",
-      "audit_procedure": "CLI:\nconfig system snmp sysinfo\nshow   (cek trap-free-memory-threshold & trap-freeable-memory-threshold)",
+      "audit_procedure": "CLI:\nconfig system snmp sysinfo\nshow   (verify trap-free-memory-threshold & trap-freeable-memory-threshold)",
       "remediation_procedure": "CLI:\nconfig system snmp sysinfo\n  set status enable\n  set trap-free-memory-threshold 20\n  set trap-freeable-memory-threshold 50\nend",
       "default_value": "trap-free-memory 5, trap-freeable-memory 60",
       "references": [
@@ -516,8 +516,8 @@
       "config_key": "config system admin > trusthost1..N",
       "expected_value": "Each admin account has a specific trusted host (not 0.0.0.0/0)",
       "rationale": "Admin access only from trusted network segments; additional layer of security.",
-      "impact": "Akses dari luar segmen diblokir termasuk admin sah (perlu jump host).",
-      "audit_procedure": "CLI:\nconfig system admin\n  edit <akun>\n  show   (cek set trusthost1 ...)\n\nGUI: System > Administrators > akun > 'Restrict login to trusted hosts'.",
+      "impact": "Access outside designated subnets will be blocked, including legitimate administrators (jump host required).",
+      "audit_procedure": "CLI:\nconfig system admin\n  edit <account>\n  show   (verify set trusthost1 ...)\n\nGUI: System > Administrators > account > 'Restrict login to trusted hosts'.",
       "remediation_procedure": "CLI:\nconfig system admin\n  edit <akun>\n  set trusthost1 10.0.0.0 255.255.255.0\nend",
       "default_value": "Each account can be accessed from anywhere (0.0.0.0/0)",
       "references": [
@@ -542,7 +542,7 @@
       "config_key": "config system accprofile + config system admin > accprofile",
       "expected_value": "Least privilege: each account uses an accprofile according to its role",
       "rationale": "Different admin levels (tier 1/2/3) require appropriate minimum privileges.",
-      "audit_procedure": "CLI:\nStage 1: config system accprofile > edit <profile> > show full\nStage 2: config system admin > edit <akun> > show full (cek accprofile)\n\nGUI: System > Admin Profiles & Administrators.",
+      "audit_procedure": "CLI:\nStage 1: config system accprofile > edit <profile> > show full\nStage 2: config system admin > edit <account> > show full (verify accprofile)\n\nGUI: System > Admin Profiles & Administrators.",
       "remediation_procedure": "CLI: customize accprofile (e.g. fwgrp custom, set address read-write) then assign to account: set accprofile <profile>.",
       "default_value": "Only prof_admin & super_admin",
       "references": [
@@ -564,7 +564,7 @@
       "config_key": "config system global > admintimeout",
       "expected_value": "<= 15 minutes (ideal 5). >15 has a negative impact on the security rating.",
       "rationale": "Prevents unauthorized access to abandoned GUI sessions.",
-      "audit_procedure": "CLI:\nget system global   (cek admintimeout, dalam menit)\n\nGUI: System > Settings > Administration Settings > Idle timeout.",
+      "audit_procedure": "CLI:\nget system global   (verify admintimeout in minutes)\n\nGUI: System > Settings > Administration Settings > Idle timeout.",
       "remediation_procedure": "CLI:\nconfig system global\n  set admintimeout 5\nend",
       "default_value": "5 minutes",
       "references": [
@@ -586,7 +586,7 @@
       "config_key": "config system interface > allowaccess",
       "expected_value": "allowaccess does not contain http & telnet (only ssh/https)",
       "rationale": "Only encrypted access to prevent credential sniffing (MiTM).",
-      "audit_procedure": "CLI:\nconfig system interface > edit <iface> > show (cek allowaccess tanpa http/telnet)\n\nGUI: Network > Interfaces > Administrative Access.",
+      "audit_procedure": "CLI:\nconfig system interface > edit <iface> > show (verify allowaccess does not contain http/telnet)\n\nGUI: Network > Interfaces > Administrative Access.",
       "remediation_procedure": "CLI:\nconfig system interface\n  edit <iface>\n  set allowaccess ssh https ping snmp\nend",
       "default_value": "HTTP & Telnet are not active on any interface",
       "references": [
@@ -608,9 +608,9 @@
       "config_key": "config firewall local-in-policy",
       "expected_value": "There is a local-in-policy to control traffic to the FortiGate interface",
       "rationale": "Local-in policy provides granular control of traffic to the FortiGate interface, beyond trusted hosts.",
-      "impact": "Diproses sebelum trusted host; validasi agar akses manajemen tidak terputus.",
+      "impact": "Processed before trusted hosts; validate carefully to avoid unintentional administrative lockout.",
       "audit_procedure": "CLI:\nconfig firewall local-in-policy\nshow\n\nGUI: aktifkan via System > Feature Visibility > Local-in policies.",
-      "remediation_procedure": "CLI (hanya via CLI):\nconfig firewall local-in-policy\n  edit <id>\n  set intf <iface>\n  set srcaddr <addr>\n  set dstaddr all\n  set action {accept|deny}\n  set service <svc>\n  set schedule always\nnext\nend",
+      "remediation_procedure": "CLI (CLI only):\nconfig firewall local-in-policy\n  edit <id>\n  set intf <iface>\n  set srcaddr <addr>\n  set dstaddr all\n  set action {accept|deny}\n  set service <svc>\n  set schedule always\nnext\nend",
       "default_value": "There is no local-in-policy by default",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/363127"
@@ -630,9 +630,9 @@
       "system_check": "auto",
       "severity": "Medium",
       "config_key": "config system global > admin-port / admin-sport / admin-https-redirect",
-      "expected_value": "admin-port & admin-sport bukan 80/443; admin-https-redirect disable",
+      "expected_value": "admin-port & admin-sport not set to 80/443; admin-https-redirect disable",
       "rationale": "Changing the default admin port reduces attack surface & port conflicts.",
-      "audit_procedure": "GUI: System > Settings > Administration Settings (cek port).",
+      "audit_procedure": "GUI: System > Settings > Administration Settings (verify ports).",
       "remediation_procedure": "CLI:\nconfig system global\n  set admin-https-redirect disable\n  set admin-port 8082\n  set admin-sport 4343\nend\nHindari port: 8080/8081, 4433, 10443.",
       "default_value": "admin-port 80, admin-sport 443, https-redirect enable",
       "references": [
@@ -656,7 +656,7 @@
       "config_key": "config firewall local-in-policy > virtual-patch",
       "expected_value": "virtual-patch enable on policies that allow traffic (requires FMWP license)",
       "rationale": "IPS signature (FMWP) provides virtual patching of GUI/SSH access before official patches are applied.",
-      "audit_procedure": "CLI:\nconfig firewall local-in-policy\nshow   (cek virtual-patch enable)",
+      "audit_procedure": "CLI:\nconfig firewall local-in-policy\nshow   (verify virtual-patch enable)",
       "remediation_procedure": "CLI:\nconfig firewall local-in-policy\n  edit <id>\n  set virtual-patch enable\nnext\nend",
       "default_value": "Disabled",
       "references": [
@@ -678,7 +678,7 @@
       "config_key": "config system ha > mode / group-name / hbdev",
       "expected_value": "a-a or a-p mode; group-name, password, hbdev are configured",
       "rationale": "HA increases availability & reduces the impact of maintenance/device failure.",
-      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek mode, group-name, hbdev)\n\nGUI: System > HA.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (verify mode, group-name, hbdev)\n\nGUI: System > HA.",
       "remediation_procedure": "CLI:\nconfig system ha\n  set mode a-p\n  set group-name \"FGT-HA\"\n  set password <pwd>\n  set hbdev port10 50\nend",
       "default_value": "N/A",
       "references": [
@@ -697,7 +697,7 @@
       "config_key": "config system ha > monitor",
       "expected_value": "Critical interfaces are included in the 'monitor set'",
       "rationale": "Interface monitoring allows failover when the physical media/port has problems.",
-      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek set monitor \"portX\" \"portY\")\n\nGUI: System > HA > Monitor Interfaces.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (verify set monitor \"portX\" \"portY\")\n\nGUI: System > HA > Monitor Interfaces.",
       "remediation_procedure": "CLI:\nconfig system ha\n  set monitor \"port6\" \"port7\"\nend",
       "default_value": "N/A",
       "references": [
@@ -716,7 +716,7 @@
       "config_key": "config system ha > ha-mgmt-status / ha-mgmt-interfaces",
       "expected_value": "ha-mgmt-status enable + minimal 1 interface & gateway",
       "rationale": "So that primary & secondary can be accessed directly without sharing a virtual MAC.",
-      "audit_procedure": "CLI:\nconfig system ha\nshow   (cek ha-mgmt-status enable & ha-mgmt-interfaces)\n\nGUI: System > HA > Management Interface Reservation.",
+      "audit_procedure": "CLI:\nconfig system ha\nshow   (verify ha-mgmt-status enable & ha-mgmt-interfaces)\n\nGUI: System > HA > Management Interface Reservation.",
       "remediation_procedure": "CLI:\nconfig system ha\n  set ha-mgmt-status enable\n  config ha-mgmt-interfaces\n    edit 1\n      set interface port6\n      set gateway 10.10.10.1\n  end\nend",
       "default_value": "N/A",
       "references": [
@@ -735,7 +735,7 @@
       "config_key": "config system ha > group-id",
       "expected_value": "group-id is not default 0 (0-1023)",
       "rationale": "Group-ID generates virtual MAC; non-default prevents MAC duplication in L2.",
-      "audit_procedure": "CLI:\nshow sys ha   (cek set group-id != 0)\n\nGUI: System > HA > Cluster Settings > Group ID.",
+      "audit_procedure": "CLI:\nshow sys ha   (verify set group-id != 0)\n\nGUI: System > HA > Cluster Settings > Group ID.",
       "remediation_procedure": "CLI:\nconfig system ha\n  set group-id 10\nend",
       "default_value": "group-id 0",
       "references": [],
@@ -775,8 +775,8 @@
       "config_key": "config firewall policy > service",
       "expected_value": "There is no policy with service 'ALL'",
       "rationale": "Prevents the firewall from accidentally allowing unauthorized protocols/services.",
-      "audit_procedure": "CLI:\nconfig firewall policy\nshow   (cek tidak ada set service \"ALL\")\n\nGUI: Policy & Objects > Firewall Policy.",
-      "remediation_procedure": "CLI:\nconfig firewall policy\n  edit <id>\n  set service \"FTP\" \"SNMP\"   (ganti dengan service spesifik)\nend",
+      "audit_procedure": "CLI:\nconfig firewall policy\nshow   (verify no policies have set service \"ALL\")\n\nGUI: Policy & Objects > Firewall Policy.",
+      "remediation_procedure": "CLI:\nconfig firewall policy\n  edit <id>\n  set service \"FTP\" \"SNMP\"   (replace with specific authorized services)\nend",
       "default_value": "Policy baru default service 'ALL'",
       "references": [],
       "cis_controls": [
@@ -793,10 +793,10 @@
       "system_check": "semi",
       "severity": "High",
       "config_key": "config firewall policy > ISDB objects",
-      "expected_value": "Ada policy deny inbound & outbound untuk ISDB (Tor, Botnet-C&C, Phishing, Proxy, Spam, Anonymous VPN, Malicious, Scanner)",
+      "expected_value": "Explicit deny inbound & outbound policies exist for ISDB (Tor, Botnet-C&C, Phishing, Proxy, Spam, Anonymous VPN, Malicious, Scanner)",
       "rationale": "Filter malicious traffic as the first layer without heavy processes like IPS.",
-      "audit_procedure": "GUI: Policy & Objects > cek policy deny inbound (source ISDB) & outbound (destination ISDB) dengan logging enabled.",
-      "remediation_procedure": "Buat 2 policy deny: (1) Inbound - source = ISDB list, action Deny, log enable; (2) Outbound - destination = ISDB list, action Deny, log enable. (ISDB list per Dec 2024/FortiOS 7.4.5)",
+      "audit_procedure": "GUI: Policy & Objects > verify deny inbound (source ISDB) & outbound (destination ISDB) policies with logging enabled.",
+      "remediation_procedure": "Create 2 deny policies: (1) Inbound - source = ISDB list, action Deny, log enable; (2) Outbound - destination = ISDB list, action Deny, log enable. (ISDB list per Dec 2024 / FortiOS 7.4.5)",
       "default_value": "There isn't any",
       "references": [],
       "cis_controls": [
@@ -815,11 +815,11 @@
       "system_check": "auto",
       "severity": "High",
       "config_key": "config firewall policy > logtraffic",
-      "expected_value": "Allow policy: log all sessions; Deny policy: log violation traffic (termasuk implicit deny)",
+      "expected_value": "Allow policy: log all sessions; Deny policy: log violation traffic (including implicit deny)",
       "rationale": "Logging of all policies enables SOC/IR investigations & threat hunting.",
-      "impact": "Default logging tidak aktif; menciptakan data gap.",
-      "audit_procedure": "GUI: Policy & Objects > Firewall Policy (validasi logging enabled di semua policy).",
-      "remediation_procedure": "Untuk allow: 'Log Allowed Traffic' = All Sessions. Untuk deny: 'Log Violation Traffic' = enable.",
+      "impact": "Default logging is disabled; creates telemetry blind spots and security data gaps.",
+      "audit_procedure": "GUI: Policy & Objects > Firewall Policy (validate logging enabled on all active policies).",
+      "remediation_procedure": "For allow policies: 'Log Allowed Traffic' = All Sessions. For deny policies: 'Log Violation Traffic' = enable.",
       "default_value": "Logging disabled",
       "references": [],
       "cis_controls": [
@@ -840,7 +840,7 @@
       "config_key": "config firewall policy > srcaddr=all & dstaddr=all & service=ALL",
       "expected_value": "There is no policy with src=all, dst=all, service=ALL",
       "rationale": "The any-any-any policy opens up a very wide attack surface; complement 3.2 & 3.4.",
-      "audit_procedure": "Parser cek setiap policy: srcaddr 'all' & dstaddr 'all' & service 'ALL' & action accept.",
+      "audit_procedure": "Parser inspects each policy: srcaddr 'all' & dstaddr 'all' & service 'ALL' & action accept.",
       "remediation_procedure": "Restrict src/dst to specific subnet/host, change specific services, enable security profile & logging.",
       "default_value": "-",
       "references": [],
@@ -859,7 +859,7 @@
       "rationale": "Block outgoing connections to the botnet as part of defense-in-depth.",
       "audit_procedure": "GUI: ensure IPS profile 'Scan Outgoing Connections to Botnet Sites' = Block; review the policy with the WAN destination.",
       "remediation_procedure": "GUI: set IPS profile botnet = Block; apply IPS profile to all outbound traffic policies to the WAN.",
-      "default_value": "Disabled pada default profile",
+      "default_value": "Disabled in default profile",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/668865"
       ],
@@ -1020,8 +1020,8 @@
       "config_key": "config system fortiguard > sandbox-inline-scan + AV profile fortisandbox",
       "expected_value": "sandbox-inline-scan enable + AV profile fortisandbox-mode inline & fortisandbox block",
       "rationale": "Cloud sandbox (FAIS) detects unknown malware & prevents patient zero (requires FAIS license).",
-      "audit_procedure": "CLI: config system fortiguard > get (cek sandbox-inline-scan enabled); config antivirus profile > show (cek fortisandbox-mode inline, fortisandbox block).\nGUI: Security Fabric > Fabric Connectors > Cloud Sandbox (Inline scan); AntiVirus profile Scan strategy=Inline, Action=Block.",
-      "remediation_procedure": "GUI: aktifkan FortiGate Cloud Sandbox (Feature Visibility), set Fabric Connector Cloud Sandbox + Region + Inline scan, buat AV profile Proxy-based, Send files to FortiSandbox, Scan strategy Inline, Action Block.",
+      "audit_procedure": "CLI: config system fortiguard > get (verify sandbox-inline-scan enabled); config antivirus profile > show (verify fortisandbox-mode inline, fortisandbox block).\nGUI: Security Fabric > Fabric Connectors > Cloud Sandbox (Inline scan); AntiVirus profile Scan strategy=Inline, Action=Block.",
+      "remediation_procedure": "GUI: Enable FortiGate Cloud Sandbox (Feature Visibility), configure Fabric Connector Cloud Sandbox + Region + Inline scan, create Proxy-based AV profile, set Send files to FortiSandbox, Scan strategy Inline, Action Block.",
       "default_value": "Disabled",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/571153/using-fortisandbox-inline-scanning-with-antivirus"
@@ -1039,9 +1039,9 @@
       "config_key": "config antivirus profile (proxy) > Content Disarm and Reconstruction",
       "expected_value": "CDR is active for office files (XLSB, OpenOffice, RTF) in AV profile proxy-mode",
       "rationale": "CDR sanitizes malicious content in documents before it reaches the user.",
-      "impact": "Tanpa CDR, payload di dokumen dapat lolos ke user.",
+      "impact": "Without Content Disarm and Reconstruction (CDR), malicious embedded payloads in office documents can reach endpoints.",
       "audit_procedure": "GUI: Security Profiles > AntiVirus > Proxy-based > APT Protection Options > Content Disarm and Reconstruction > 'Apply CDR to office files' enabled.",
-      "remediation_procedure": "GUI: buat AV profile Proxy-based, aktifkan CDR & 'Apply CDR to office files' (Office/OpenOffice/RTF/XLSB).",
+      "remediation_procedure": "GUI: Create Proxy-based AV profile, enable CDR & 'Apply CDR to office files' (Office/OpenOffice/RTF/XLSB).",
       "default_value": "Disabled",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.0/new-features/920942/support-xlsb-openoffice-and-rtf-files-for-cdr-in-antivirus-profiles-7-4-4"
@@ -1060,11 +1060,11 @@
       "system_check": "semi",
       "severity": "Medium",
       "config_key": "config dnsfilter profile > redirect botnet C&C",
-      "expected_value": "'Redirect botnet C&C requests to Block Portal' enable + diterapkan pada policy DNS",
+      "expected_value": "'Redirect botnet C&C requests to Block Portal' enabled + applied to DNS policies",
       "rationale": "Block botnets at the DNS resolution stage as an additional layer of defense.",
-      "audit_procedure": "GUI: Security Profiles > DNS Filter > 'Redirect botnet C&C requests to Block Portal' enabled; pastikan policy DNS pakai DNS Filter profile.",
+      "audit_procedure": "GUI: Security Profiles > DNS Filter > 'Redirect botnet C&C requests to Block Portal' enabled; ensure DNS policy uses DNS Filter profile.",
       "remediation_procedure": "GUI: activate the option in the DNS Filter profile & apply it to the DNS policy.",
-      "default_value": "Enabled pada default profile",
+      "default_value": "Enabled in default profile",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.4.5/administration-guide/105208"
       ],
@@ -1085,9 +1085,9 @@
       "config_key": "config dnsfilter profile > log-all-domain",
       "expected_value": "log-all-domain enable",
       "rationale": "Log all DNS queries/responses for SOC/IR investigations.",
-      "impact": "Default: allowed DNS tidak dilog (data gap).",
+      "impact": "Default: allowed DNS queries are not logged (creates telemetry blind spots).",
       "audit_procedure": "GUI: Security Profiles > DNS Filter > 'Log all DNS queries and responses' enabled.\nCLI: config dnsfilter profile > show (set log-all-domain enable).",
-      "remediation_procedure": "Aktifkan 'Log all DNS queries and responses' pada DNS Filter profile.",
+      "remediation_procedure": "Enable 'Log all DNS queries and responses' in the DNS Filter profile.",
       "default_value": "Disabled",
       "references": [
         "https://community.fortinet.com/t5/FortiGate/Technical-Tip-FortiGate-Static-DNS-filter-behavior-in-logging/ta-p/223110"
@@ -1130,10 +1130,10 @@
       "config_key": "config webfilter profile > Security Risk categories",
       "expected_value": "Kategori Security Risk (Malicious Websites, Phishing, Spam URLs) = Block",
       "rationale": "The Security Risk category is often an attack vector (malware, phishing, C2).",
-      "impact": "Set 'Newly Observed/Registered Domains' ke Block dapat memblokir website baru/uncategorized.",
-      "audit_procedure": "GUI: Security Profiles > Web Filter > pastikan Security Risk (Malicious/Phishing/Spam URLs) = Block.",
+      "impact": "Setting 'Newly Observed/Registered Domains' to Block may block newly created legitimate web domains.",
+      "audit_procedure": "GUI: Security Profiles > Web Filter > verify Security Risk (Malicious/Phishing/Spam URLs) = Block.",
       "remediation_procedure": "Apply Web Filter profile to policy/SD-WAN; set Security Risk categories = Block.",
-      "default_value": "Semua kategori Security Risk & Unrated default Block",
+      "default_value": "All Security Risk & Unrated categories default to Block",
       "references": [
         "https://docs.fortinet.com/document/fortigate/7.6.2/administration-guide/267887/configuring-a-web-filter-profile"
       ],
@@ -1150,7 +1150,7 @@
       "config_key": "config application list > P2P/Proxy",
       "expected_value": "Kategori P2P & Proxy = Block",
       "rationale": "P2P/Proxy applications are known to spread malware & can bypass inspections.",
-      "audit_procedure": "GUI: Security Profiles > Application Control > pastikan P2P & Proxy = Block.",
+      "audit_procedure": "GUI: Security Profiles > Application Control > verify P2P & Proxy = Block.",
       "remediation_procedure": "Set the P2P & Proxy category = Block in the App Control profile.",
       "default_value": "All default categories 'Monitor'",
       "references": [
@@ -1235,10 +1235,10 @@
       "system_check": "semi",
       "severity": "Medium",
       "config_key": "config system automation-stitch > Compromised Host Quarantine",
-      "expected_value": "Automation stitch 'Compromised Host Quarantine' status enable (jika pakai Fabric ecosystem)",
-      "rationale": "Karantina otomatis host high-severity pada FortiAP/FortiSwitch/FortiClient EMS.",
-      "audit_procedure": "GUI: Security Fabric > Automation > pastikan 'Compromised Host Quarantine' enabled.",
-      "remediation_procedure": "GUI: Security Fabric > Automation > ubah Disabled ke Enabled (butuh FortiAP/FortiSwitch/FortiClient EMS).",
+      "expected_value": "Automation stitch 'Compromised Host Quarantine' status enabled (if deployed in Fabric ecosystem)",
+      "rationale": "Automatically quarantine high-severity compromised hosts across FortiAP, FortiSwitch, and FortiClient EMS.",
+      "audit_procedure": "GUI: Security Fabric > Automation > verify 'Compromised Host Quarantine' enabled.",
+      "remediation_procedure": "GUI: Security Fabric > Automation > change Disabled to Enabled (requires FortiAP, FortiSwitch, or FortiClient EMS).",
       "default_value": "Not enabled",
       "references": [],
       "cis_controls": [
@@ -1259,7 +1259,7 @@
       "config_key": "Security Fabric Setup > root FortiGate",
       "expected_value": "Root FortiGate status enable, role 'Serve as Fabric Root' (if Fabric feature is used)",
       "rationale": "Without FortiGate root, Security Fabric does not work.",
-      "impact": "Tanpa Fabric, visibilitas & manajemen trafik menurun.",
+      "impact": "Without Security Fabric integration, cross-device traffic visibility and centralized threat response are diminished.",
       "audit_procedure": "GUI: Security Fabric > Fabric Connectors > Security Fabric Setup (status enabled, role Fabric Root, FortiAnalyzer & fabric name diisi).",
       "remediation_procedure": "GUI: set root FortiGate enable + role 'Serve as Fabric Root', konfigurasi FortiAnalyzer & fabric name + interface join.",
       "default_value": "Disabled",
@@ -1318,7 +1318,7 @@
       "config_key": "config log eventfilter > event",
       "expected_value": "event enable (all event types)",
       "rationale": "Event logging generates logs for review/audit & ingest to SIEM/Analyzer.",
-      "audit_procedure": "CLI:\nconfig log eventfilter\nget   (validasi semua event enabled)",
+      "audit_procedure": "CLI:\nconfig log eventfilter\nget   (validate all events enabled)",
       "remediation_procedure": "GUI: Log & Report > Log Settings > enable 'All' Event Logging.\nCLI:\nconfig log eventfilter\n  set event enable\nend",
       "default_value": "Enabled",
       "references": [
@@ -1344,7 +1344,7 @@
       "config_key": "config log syslogd setting / config log fortianalyzer setting",
       "expected_value": "Logs sent to centralized devices (SIEM/Syslog/FortiAnalyzer/FortiManager)",
       "rationale": "Centralized logging provides more reliable retention & richer data for review.",
-      "audit_procedure": "GUI: Log & Report > Log Settings > cek 'Syslog logging' offload ke device lain.",
+      "audit_procedure": "GUI: Log & Report > Log Settings > verify 'Syslog logging' is configured to offload logs to external SIEM/analyzer.",
       "remediation_procedure": "GUI: Log & Report > Log Settings > remote server configuration in 'Syslog logging'.",
       "default_value": "Not configured",
       "references": [
@@ -1368,7 +1368,7 @@
       "config_key": "config log fortianalyzer setting > reliable / enc-algorithm",
       "expected_value": "reliable enable & enc-algorithm high",
       "rationale": "Encryption of logs to FAZ/FMG prevents logs from being intercepted in transit.",
-      "audit_procedure": "CLI:\nconfig log fortianalyzer setting\nget   (validasi enc-algorithm high & reliable enable)",
+      "audit_procedure": "CLI:\nconfig log fortianalyzer setting\nget   (validate enc-algorithm high & reliable enable)",
       "remediation_procedure": "CLI:\nconfig log fortianalyzer setting\n  set reliable enable\n  set enc-algorithm high\nend",
       "default_value": "Disabled",
       "references": [
@@ -1391,7 +1391,7 @@
       "expected_value": "reliable enable & enc-algorithm high",
       "rationale": "Encryption of logs to syslog prevents logs from being intercepted in transit.",
       "note_dedup": "CIS 7.3.3 identik dengan 7.3.2 (editorial duplicate). Implementasikan HANYA sekali agar tidak double-penalty.",
-      "audit_procedure": "CLI:\nconfig log syslog setting\nget   (validasi enc-algorithm high & reliable enable)",
+      "audit_procedure": "CLI:\nconfig log syslog setting\nget   (validate enc-algorithm high & reliable enable)",
       "remediation_procedure": "CLI:\nconfig log syslog setting\n  set reliable enable\n  set enc-algorithm high\nend",
       "default_value": "Disabled",
       "references": [
